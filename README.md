@@ -4,6 +4,8 @@
 
 Tutti i vocaboli e i detti sono sincronizzati localmente in note Markdown con frontmatter YAML e collegamenti Wikilink, pronti per essere esplorati come un cervello digitale visivo all'interno di **Obsidian**.
 
+![Schermata Principale di Verba](preview.png)
+
 ---
 
 ## 🌟 Funzionalità Principali
