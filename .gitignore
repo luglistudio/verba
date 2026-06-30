@@ -25,7 +25,9 @@ venv/
 # Sessioni generate
 vocab_session.txt
 current_quiz.json
+Vocabulary Quiz.json
 app_debug.log
 config.json
 *.json.bak
 wiki/
+.obsidian/
