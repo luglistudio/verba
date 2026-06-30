@@ -1,0 +1,395 @@
+{
+  "title": "Vocabulary Quiz",
+  "questions": [
+    {
+      "question": "What is the primary meaning of the verb 'vergare' when used in a literary or formal context?",
+      "answerOptions": [
+        {
+          "text": "To write by hand",
+          "isCorrect": true,
+          "rationale": "The term is used specifically to describe the physical act of writing something, such as a letter or a signature, manually."
+        },
+        {
+          "text": "To erase or delete",
+          "isCorrect": false,
+          "rationale": "This word describes the creation of text rather than its removal or destruction."
+        },
+        {
+          "text": "To print using a machine",
+          "isCorrect": false,
+          "rationale": "The term specifically refers to the non-automated, manual act of handwriting."
+        },
+        {
+          "text": "To read aloud",
+          "isCorrect": false,
+          "rationale": "This describes the oral delivery of text, whereas the term refers to the physical production of it on paper."
+        }
+      ],
+      "hint": "Consider the physical act of producing a signature or a personal letter."
+    },
+    {
+      "question": "An 'ottuagenario' is a person who has reached which specific age?",
+      "answerOptions": [
+        {
+          "text": "Eighty years old",
+          "isCorrect": true,
+          "rationale": "Derived from the Latin for eighty, this term describes someone in their ninth decade of life."
+        },
+        {
+          "text": "Seventy years old",
+          "isCorrect": false,
+          "rationale": "A person of this age would be referred to as a septuagenarian, not an octuagenarian."
+        },
+        {
+          "text": "Ninety years old",
+          "isCorrect": false,
+          "rationale": "This age group is referred to as nonagenarians."
+        },
+        {
+          "text": "One hundred years old",
+          "isCorrect": false,
+          "rationale": "A person who has reached one hundred is called a centenarian."
+        }
+      ],
+      "hint": "The prefix of the word is related to the number of tentacles on an octopus."
+    },
+    {
+      "question": "In a legal or philosophical context, what does it mean to act 'surrettiziamente'?",
+      "answerOptions": [
+        {
+          "text": "To act with transparency",
+          "isCorrect": false,
+          "rationale": "The term implies the opposite of openness, involving the intentional concealment of facts."
+        },
+        {
+          "text": "To act through a representative",
+          "isCorrect": false,
+          "rationale": "This describes a surrogate action, which is distinct from the secretive nature of the term in question."
+        },
+        {
+          "text": "To act stealthily or by omitting facts",
+          "isCorrect": true,
+          "rationale": "It refers to performing an act while intentionally keeping someone in the dark or hiding a relevant truth."
+        },
+        {
+          "text": "To act with sudden violence",
+          "isCorrect": false,
+          "rationale": "While the root involves 'seizing,' the modern usage focuses on deception and secrecy rather than physical force."
+        }
+      ],
+      "hint": "This word describes a hidden maneuver intended to deceive by what is left unsaid."
+    },
+    {
+      "question": "What is the figurative meaning of the word 'sicofante' in modern literary usage?",
+      "answerOptions": [
+        {
+          "text": "A judge",
+          "isCorrect": false,
+          "rationale": "While the term originated in a legal setting, it refers to those reporting crimes rather than those adjudicating them."
+        },
+        {
+          "text": "A spy or informer",
+          "isCorrect": true,
+          "rationale": "Coming from the Greek for 'denouncer of figs,' the term has evolved to describe someone who informs on others or acts as a spy."
+        },
+        {
+          "text": "A fruit merchant",
+          "isCorrect": false,
+          "rationale": "This is a literal interpretation of the etymology (fig-denouncer) but does not reflect the word's figurative meaning."
+        },
+        {
+          "text": "A street performer",
+          "isCorrect": false,
+          "rationale": "This is a misconception that might arise from the word's rhythmic sound, but it has no basis in its actual definition."
+        }
+      ],
+      "hint": "The word describes someone who covertly gathers information to denounce others."
+    },
+    {
+      "question": "The term 'lubrico' can describe a slippery surface, but what is its elevated figurative meaning?",
+      "answerOptions": [
+        {
+          "text": "Offensively indecent or obscene",
+          "isCorrect": true,
+          "rationale": "The word is used to describe gestures, conversations, or behaviors that offend the sense of modesty."
+        },
+        {
+          "text": "Extremely fast or agile",
+          "isCorrect": false,
+          "rationale": "While slippery things can move fast, the figurative meaning specifically targets moral indecency."
+        },
+        {
+          "text": "Shining or polished",
+          "isCorrect": false,
+          "rationale": "A polished surface may be slippery, but this term focuses on the unpleasant or 'viscid' nature of a subject."
+        },
+        {
+          "text": "Scientifically precise",
+          "isCorrect": false,
+          "rationale": "This adjective describes moral or physical instability, which is the opposite of the firm ground of precision."
+        }
+      ],
+      "hint": "Think about a type of behavior that would be considered scandalous or crude."
+    },
+    {
+      "question": "Which adjective describes a person who is reserved, solitary, and perhaps a bit touchy?",
+      "answerOptions": [
+        {
+          "text": "Volitivo",
+          "isCorrect": false,
+          "rationale": "This term describes a person with a strong will, which is a different character trait than being solitary or shy."
+        },
+        {
+          "text": "Umbratile",
+          "isCorrect": true,
+          "rationale": "Literally meaning 'in the shade,' it describes someone who prefers a quiet, secluded, or secretive life."
+        },
+        {
+          "text": "Solerte",
+          "isCorrect": false,
+          "rationale": "This adjective refers to a diligent and industrious person, not someone's social preference for isolation."
+        },
+        {
+          "text": "Limaccioso",
+          "isCorrect": false,
+          "rationale": "This term describes something muddy or unclear, and is generally applied to water or prose, not human personality."
+        }
+      ],
+      "hint": "This word shares its root with the Latin word for 'shadow'."
+    },
+    {
+      "question": "What does the symbol of the 'caduceo' represent in modern society?",
+      "answerOptions": [
+        {
+          "text": "The military forces",
+          "isCorrect": false,
+          "rationale": "The staff with intertwined serpents is not a military emblem; those usually involve weapons or shields."
+        },
+        {
+          "text": "The medical profession",
+          "isCorrect": true,
+          "rationale": "This staff, featuring two snakes and wings, is the traditional emblem for doctors and medical orders."
+        },
+        {
+          "text": "Legal justice",
+          "isCorrect": false,
+          "rationale": "The symbol for justice is typically the scales, whereas the caduceus is associated with healing and Mercury."
+        },
+        {
+          "text": "Academic excellence",
+          "isCorrect": false,
+          "rationale": "While a symbol of knowledge, the specific winged staff with snakes is most identified with the order of physicians."
+        }
+      ],
+      "hint": "You would most likely see this emblem outside a pharmacy or on an ambulance."
+    },
+    {
+      "question": "A 'scossa tellurica' is a term used to describe what natural phenomenon?",
+      "answerOptions": [
+        {
+          "text": "A solar flare",
+          "isCorrect": false,
+          "rationale": "The term specifically refers to the Earth (Tellus), whereas a solar flare originates from the sun."
+        },
+        {
+          "text": "An earthquake",
+          "isCorrect": true,
+          "rationale": "Derived from the Latin 'tellus' (earth), the word refers to seismic movements or shocks within the Earth's crust."
+        },
+        {
+          "text": "A tidal wave",
+          "isCorrect": false,
+          "rationale": "This is a maritime or aquatic phenomenon, whereas the term in question is strictly related to the land."
+        },
+        {
+          "text": "A hurricane",
+          "isCorrect": false,
+          "rationale": "This is an atmospheric event, while 'tellurico' relates specifically to the ground and solid earth."
+        }
+      ],
+      "hint": "This relates to the Earth's crust and seismic activity."
+    },
+    {
+      "question": "What is the philosophical meaning of 'ipostatizzazione'?",
+      "answerOptions": [
+        {
+          "text": "Treating an abstract concept as a concrete reality",
+          "isCorrect": true,
+          "rationale": "It involves 'reifying' or giving an autonomous, concrete existence to an idea that is otherwise just a linguistic or mental construct."
+        },
+        {
+          "text": "The process of doubting everything",
+          "isCorrect": false,
+          "rationale": "This describes skepticism, while the term in question is about the ontological status of concepts."
+        },
+        {
+          "text": "The study of ancient manuscripts",
+          "isCorrect": false,
+          "rationale": "This would be paleography or philology, unrelated to the treatment of abstract notions in philosophy."
+        },
+        {
+          "text": "The transition from life to death",
+          "isCorrect": false,
+          "rationale": "The term is used to describe logical or conceptual errors in reasoning, not biological processes."
+        }
+      ],
+      "hint": "Think of the synonym 'reification,' where an idea is turned into a 'thing'."
+    },
+    {
+      "question": "If someone's hair is described as 'serico', what is its defining characteristic?",
+      "answerOptions": [
+        {
+          "text": "It is curly and thick",
+          "isCorrect": false,
+          "rationale": "The term relates to a specific texture of smoothness rather than a pattern like curls."
+        },
+        {
+          "text": "It is rough and brittle",
+          "isCorrect": false,
+          "rationale": "This is the opposite of the fine and soft quality implied by the word."
+        },
+        {
+          "text": "It is silky and soft",
+          "isCorrect": true,
+          "rationale": "The adjective is derived from 'sericum' (silk) and describes things that share silk's fine, smooth, or lustrous qualities."
+        },
+        {
+          "text": "It is grey or white",
+          "isCorrect": false,
+          "rationale": "While hair can be both grey and soft, the term specifically denotes the texture of silk, not a specific color."
+        }
+      ],
+      "hint": "This word is etymologically linked to the people of the Far East known for producing a specific luxury fabric."
+    },
+    {
+      "question": "What does the medical term 'efelide' refer to?",
+      "answerOptions": [
+        {
+          "text": "A skin rash",
+          "isCorrect": false,
+          "rationale": "A rash is typically an inflammation, while this term describes small, stable brownish spots on the skin."
+        },
+        {
+          "text": "A freckle",
+          "isCorrect": true,
+          "rationale": "Common in fair-skinned or red-haired individuals, these are small pigment spots intensified by sun exposure."
+        },
+        {
+          "text": "A deep scar",
+          "isCorrect": false,
+          "rationale": "Scars are tissues formed after an injury, whereas these spots are pigmentations often present since childhood."
+        },
+        {
+          "text": "A type of wart",
+          "isCorrect": false,
+          "rationale": "Warts are raised growths caused by viruses, while the term in question describes flat spots of color."
+        }
+      ],
+      "hint": "The Greek root of this word includes the word for 'sun'."
+    },
+    {
+      "question": "What is the core sentiment behind Baudelaire's famous line: 'Hypocrite lecteur, - mon semblable, - mon fr\u00e8re!'?",
+      "answerOptions": [
+        {
+          "text": "A celebration of the reader's superior morality",
+          "isCorrect": false,
+          "rationale": "The quote actually attacks the reader's pretense of morality by calling them a 'hypocrite'."
+        },
+        {
+          "text": "An acknowledgment of shared human corruption and vice",
+          "isCorrect": true,
+          "rationale": "Baudelaire suggests that the reader is no better than the poet, sharing the same weaknesses and 'noia' (boredom)."
+        },
+        {
+          "text": "A warning to stay away from bad literature",
+          "isCorrect": false,
+          "rationale": "The address to 'mon fr\u00e8re' is metaphorical, indicating a spiritual or existential brotherhood in sin."
+        },
+        {
+          "text": "A warning to stay away from bad literature",
+          "isCorrect": false,
+          "rationale": "The poet is inviting the reader into the work, not pushing them away, though the invitation is an embittered one."
+        }
+      ],
+      "hint": "The poet is leveling the playing field between himself and the person reading his book."
+    },
+    {
+      "question": "How would you describe an 'improvvido' decision?",
+      "answerOptions": [
+        {
+          "text": "One made with great foresight",
+          "isCorrect": false,
+          "rationale": "The word implies a lack of 'previdenza' or the inability to see what is coming."
+        },
+        {
+          "text": "One made without considering the consequences",
+          "isCorrect": true,
+          "rationale": "It describes an incautious or sconsiderate act performed by someone who fails to look ahead."
+        },
+        {
+          "text": "One that was planned for years",
+          "isCorrect": false,
+          "rationale": "Long-term planning is the opposite of an 'improvvido' action, which is often reckless."
+        },
+        {
+          "text": "One that results in great profit",
+          "isCorrect": false,
+          "rationale": "While it could result in profit by luck, the term describes the lack of care in the decision-making process itself."
+        }
+      ],
+      "hint": "This adjective is the opposite of 'provident' or 'farsighted'."
+    },
+    {
+      "question": "What behavior defines someone as a 'sornione'?",
+      "answerOptions": [
+        {
+          "text": "Being loud and aggressive",
+          "isCorrect": false,
+          "rationale": "A 'sornione' is characterized by a 'placid indifference,' which is the opposite of outward aggression."
+        },
+        {
+          "text": "Hiding a sharp, vigiliant cunning under a mask of indifference",
+          "isCorrect": true,
+          "rationale": "It describes someone who seems calm or even foolish on the outside but is actually very shrewd and observant."
+        },
+        {
+          "text": "Acting with absolute honesty and transparency",
+          "isCorrect": false,
+          "rationale": "The word implies a level of deception or 'astuzia' (cunning) that is incompatible with total transparency."
+        },
+        {
+          "text": "Expressing constant sadness and melancholy",
+          "isCorrect": false,
+          "rationale": "While they may appear quiet, the core of a 'sornione' is their hidden intelligence, not their emotional state."
+        }
+      ],
+      "hint": "This term is often used to describe the deceptive calm of a cat."
+    },
+    {
+      "question": "To 'esecrare' something is to feel which of the following?",
+      "answerOptions": [
+        {
+          "text": "Profound horror and detestation",
+          "isCorrect": true,
+          "rationale": "This elevated verb means to abominate or hold something in total horror, often for moral reasons."
+        },
+        {
+          "text": "Mild curiosity",
+          "isCorrect": false,
+          "rationale": "The word represents an intense, visceral reaction of disgust, not a casual interest."
+        },
+        {
+          "text": "Deep admiration",
+          "isCorrect": false,
+          "rationale": "This is the polar opposite of the word's meaning, which involves rejection and loathing."
+        },
+        {
+          "text": "A sense of confusion",
+          "isCorrect": false,
+          "rationale": "While the subject might be shocking, 'esecrare' implies a clear judgment of hatred rather than a lack of understanding."
+        }
+      ],
+      "hint": "The word shares a root with 'sacred' but refers to casting something 'out' of that status."
+    }
+  ]
+}

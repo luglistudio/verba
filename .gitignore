@@ -1,0 +1,31 @@
+# Database SQLite (74MB, generato da script esterno)
+dictionary.db
+
+# Build output
+dist/
+build/
+*.spec.bak
+Vocabolario.spec.bak
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# macOS
+.DS_Store
+
+# IDEs & Editor
+.idea/
+.vscode/
+.claude/
+
+# Sessioni generate
+vocab_session.txt
+current_quiz.json
+app_debug.log
+config.json
+*.json.bak
+wiki/
