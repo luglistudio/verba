@@ -82,7 +82,13 @@ verba/
    pip install -r requirements.txt
    ```
 
-3. Avvia l'applicazione:
+3. (Opzionale) Inizializza il dizionario offline da oltre 500.000 termini:
+   ```bash
+   python build_dict.py
+   ```
+   *Nota: L'esecuzione di questo comando scaricherà l'estrazione italiana dal dizionario ed edificherà il file locale `dictionary.db`. Se saltato, l'applicazione funzionerà comunque al 100%, ma l'autocompilazione istantanea per i nuovi lemmi non sarà attiva e dovrai inserire significato ed etimologia manualmente.*
+
+4. Avvia l'applicazione:
    ```bash
    python app.py
    ```
