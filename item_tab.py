@@ -123,8 +123,7 @@ class ItemTab:
         grid_frame = ctk.CTkFrame(self.parent_frame, fg_color="transparent")
         grid_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         grid_frame.columnconfigure(0, weight=2)
-        grid_frame.columnconfigure(1, weight=2)
-        grid_frame.columnconfigure(2, weight=4)
+        grid_frame.columnconfigure(1, weight=6)
         grid_frame.rowconfigure(0, weight=1)
 
         # Colonna 1: Lista completa
@@ -145,27 +144,9 @@ class ItemTab:
         l_list.config(yscrollcommand=s_list.set)
         l_list.bind('<<ListboxSelect>>', self._on_select)
 
-        # Colonna 2: Links (Sinonimi / Detti Simili)
-        f_links = ctk.CTkFrame(grid_frame, fg_color="transparent")
-        f_links.grid(row=0, column=1, sticky="nsew", padx=5)
-        
-        title_links = "Sinonimi (Navigabili)" if is_word else "Detti Simili (Navigabili)"
-        ctk.CTkLabel(f_links, text=title_links, font=ctk.CTkFont(family="System", size=14, weight="bold")).pack(anchor=tk.W, pady=(0, 5))
-        
-        links_container = ctk.CTkFrame(f_links, fg_color="transparent")
-        links_container.pack(fill=tk.BOTH, expand=True)
-
-        l_links = tk.Listbox(links_container, exportselection=False)
-        l_links.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        
-        s_links = ctk.CTkScrollbar(links_container, command=l_links.yview)
-        s_links.pack(side=tk.RIGHT, fill=tk.Y, padx=(5, 0))
-        l_links.config(yscrollcommand=s_links.set)
-        l_links.bind('<<ListboxSelect>>', self._on_link_select)
-
-        # Colonna 3: Editor
+        # Colonna 2: Editor (ora occupa la parte centrale ed è molto più grande)
         f_edit = ctk.CTkScrollableFrame(grid_frame, label_text="Scheda Dettagli" if is_word else "Scheda Detto", label_font=ctk.CTkFont(family="System", size=14, weight="bold"))
-        f_edit.grid(row=0, column=2, sticky="nsew", padx=5)
+        f_edit.grid(row=0, column=1, sticky="nsew", padx=5)
 
         # Titolo + audio
         f_title = ctk.CTkFrame(f_edit, fg_color="transparent")
@@ -189,7 +170,24 @@ class ItemTab:
         t_ety = ctk.CTkTextbox(f_edit, wrap=tk.WORD, font=("System", 13), height=100)
         t_ety.pack(fill=tk.X, pady=(0, 10))
 
-        lbl_links = "Sinonimi (separati da virgola):" if is_word else "Detti Simili (separati da virgola):"
+        # Sinonimi/Detti Simili (Navigabili) in un box barra più piccola simile all'etimologia
+        lbl_links_title = "Sinonimi (Navigabili):" if is_word else "Detti Simili (Navigabili):"
+        ctk.CTkLabel(f_edit, text=lbl_links_title, font=ctk.CTkFont(family="System", size=12)).pack(anchor=tk.W, pady=(5, 2))
+        
+        links_box_frame = ctk.CTkFrame(f_edit, height=90)
+        links_box_frame.pack(fill=tk.X, pady=(0, 10))
+        links_box_frame.pack_propagate(False)
+
+        l_links = tk.Listbox(links_box_frame, exportselection=False)
+        l_links.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        s_links = ctk.CTkScrollbar(links_box_frame, command=l_links.yview)
+        s_links.pack(side=tk.RIGHT, fill=tk.Y, padx=(5, 0))
+        l_links.config(yscrollcommand=s_links.set)
+        l_links.bind('<<ListboxSelect>>', self._on_link_select)
+
+        # Modifica Sinonimi/Detti Simili (testo separato da virgola)
+        lbl_links = "Modifica Sinonimi (separati da virgola):" if is_word else "Modifica Detti Simili (separati da virgola):"
         ctk.CTkLabel(f_edit, text=lbl_links, font=ctk.CTkFont(family="System", size=12)).pack(anchor=tk.W, pady=(5, 2))
         e_links = ctk.CTkEntry(f_edit, font=("System", 13))
         e_links.pack(fill=tk.X, pady=(0, 15))
