@@ -18,6 +18,7 @@ from db import WordDatabase
 from item_tab import ItemTab
 from tutor_tab import TutorTab
 from spaced_tab import SpacedTab
+from settings_tab import SettingsTab
 
 # Impostazioni di stile globale CustomTkinter
 ctk.set_appearance_mode("system")  # Segue il tema del sistema operativo
@@ -81,12 +82,24 @@ class VocabolarioApp(ctk.CTk):
         self.notebook.add("Detti e Proverbi")
         self.notebook.add("Tutor AI (NotebookLM)")
         self.notebook.add("Spaced Repetition (Ripasso)")
+        self.notebook.add("Impostazioni")
 
         # Inizializza i componenti grafici all'interno dei relativi tab
         self.words_tab = ItemTab(self.notebook.tab("Parole"), self.db, item_type="word")
         self.sayings_tab = ItemTab(self.notebook.tab("Detti e Proverbi"), self.db, item_type="detto")
         self.tutor_tab = TutorTab(self.notebook.tab("Tutor AI (NotebookLM)"), self.db, self._enqueue_ui)
         self.spaced_tab = SpacedTab(self.notebook.tab("Spaced Repetition (Ripasso)"), self.db)
+        self.settings_tab = SettingsTab(self.notebook.tab("Impostazioni"), self.db, self.update_font_sizes)
+
+        # Applica i font iniziali impostati
+        self.update_font_sizes()
+
+    def update_font_sizes(self):
+        self.words_tab.update_fonts()
+        self.sayings_tab.update_fonts()
+        self.tutor_tab.update_fonts()
+        self.spaced_tab.update_fonts()
+        self.settings_tab.update_fonts()
 
     def _on_tab_changed(self):
         try:

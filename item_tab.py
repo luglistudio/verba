@@ -38,7 +38,7 @@ class SuggestionDialog(ctk.CTkToplevel):
         main_frame = ctk.CTkFrame(self, fg_color="transparent")
         main_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
 
-        lbl = ctk.CTkLabel(main_frame, text="Parola non trovata. Forse cercavi:", font=ctk.CTkFont(family="System", size=13, weight="bold"))
+        lbl = ctk.CTkLabel(main_frame, text="Parola non trovata. Forse cercavi:", font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"))
         lbl.pack(anchor=tk.W, pady=(0, 10))
 
         list_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
@@ -60,7 +60,7 @@ class SuggestionDialog(ctk.CTkToplevel):
             highlightthickness=1,
             highlightbackground=border_color,
             highlightcolor="#007aff",
-            font=("System", 13),
+            font=("Helvetica", 13),
             exportselection=False
         )
         self.listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -122,7 +122,7 @@ class ItemTab:
         # Grid-based layout per una spaziatura e allineamento perfetti
         grid_frame = ctk.CTkFrame(self.parent_frame, fg_color="transparent")
         grid_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        grid_frame.columnconfigure(0, weight=2)
+        grid_frame.columnconfigure(0, weight=1)
         grid_frame.columnconfigure(1, weight=6)
         grid_frame.rowconfigure(0, weight=1)
 
@@ -131,7 +131,7 @@ class ItemTab:
         f_list.grid(row=0, column=0, sticky="nsew", padx=5)
         
         title_list = "Tutte le Parole" if is_word else "Tutti i Detti"
-        ctk.CTkLabel(f_list, text=title_list, font=ctk.CTkFont(family="System", size=14, weight="bold")).pack(anchor=tk.W, pady=(0, 5))
+        ctk.CTkLabel(f_list, text=title_list, font=ctk.CTkFont(family="Helvetica", size=14, weight="bold")).pack(anchor=tk.W, pady=(0, 5))
         
         list_container = ctk.CTkFrame(f_list, fg_color="transparent")
         list_container.pack(fill=tk.BOTH, expand=True)
@@ -145,34 +145,37 @@ class ItemTab:
         l_list.bind('<<ListboxSelect>>', self._on_select)
 
         # Colonna 2: Editor (ora occupa la parte centrale ed è molto più grande)
-        f_edit = ctk.CTkScrollableFrame(grid_frame, label_text="Scheda Dettagli" if is_word else "Scheda Detto", label_font=ctk.CTkFont(family="System", size=14, weight="bold"))
+        f_edit = ctk.CTkScrollableFrame(grid_frame, label_text="Scheda Dettagli" if is_word else "Scheda Detto", label_font=ctk.CTkFont(family="Helvetica", size=14, weight="bold"))
         f_edit.grid(row=0, column=1, sticky="nsew", padx=5)
 
-        # Titolo + audio
+        # Titolo + audio (centrati e grandi)
         f_title = ctk.CTkFrame(f_edit, fg_color="transparent")
-        f_title.pack(anchor=tk.W, fill=tk.X, pady=(0, 10))
+        f_title.pack(fill=tk.X, pady=(15, 25))
 
-        lbl_title = ctk.CTkLabel(f_title, text="Nessun elemento", font=ctk.CTkFont(family="System", size=18, weight="bold"))
-        lbl_title.pack(side=tk.LEFT)
+        f_title_inner = ctk.CTkFrame(f_title, fg_color="transparent")
+        f_title_inner.pack(anchor=tk.CENTER)
 
-        btn_speak = ctk.CTkButton(f_title, text="Ascolta 🔊", width=80, height=26, font=ctk.CTkFont(family="System", size=12), command=self._speak_current)
+        lbl_title = ctk.CTkLabel(f_title_inner, text="Nessun elemento", font=ctk.CTkFont(family="Helvetica", size=38, weight="bold"))
+        lbl_title.pack(side=tk.LEFT, padx=10)
+
+        btn_speak = ctk.CTkButton(f_title_inner, text="Ascolta 🔊", width=110, height=34, font=ctk.CTkFont(family="Helvetica", size=13), command=self._speak_current)
         btn_speak.pack(side=tk.LEFT, padx=10)
 
-        ctk.CTkLabel(f_edit, text="Pronuncia (Accenti/Dizione):", font=ctk.CTkFont(family="System", size=12)).pack(anchor=tk.W, pady=(5, 2))
-        e_pron = ctk.CTkEntry(f_edit, font=("System", 13))
+        ctk.CTkLabel(f_edit, text="Pronuncia (Accenti/Dizione):", font=ctk.CTkFont(family="Helvetica", size=12)).pack(anchor=tk.W, pady=(5, 2))
+        e_pron = ctk.CTkEntry(f_edit, font=("Helvetica", 13))
         e_pron.pack(fill=tk.X, pady=(0, 10))
 
-        ctk.CTkLabel(f_edit, text="Significato:", font=ctk.CTkFont(family="System", size=12)).pack(anchor=tk.W, pady=(5, 2))
-        t_def = ctk.CTkTextbox(f_edit, wrap=tk.WORD, font=("System", 13), height=140)
+        ctk.CTkLabel(f_edit, text="Significato:", font=ctk.CTkFont(family="Helvetica", size=12)).pack(anchor=tk.W, pady=(5, 2))
+        t_def = ctk.CTkTextbox(f_edit, wrap=tk.WORD, font=("Helvetica", 13), height=140)
         t_def.pack(fill=tk.X, pady=(0, 10))
 
-        ctk.CTkLabel(f_edit, text="Etimologia:", font=ctk.CTkFont(family="System", size=12)).pack(anchor=tk.W, pady=(5, 2))
-        t_ety = ctk.CTkTextbox(f_edit, wrap=tk.WORD, font=("System", 13), height=100)
+        ctk.CTkLabel(f_edit, text="Etimologia:", font=ctk.CTkFont(family="Helvetica", size=12)).pack(anchor=tk.W, pady=(5, 2))
+        t_ety = ctk.CTkTextbox(f_edit, wrap=tk.WORD, font=("Helvetica", 13), height=100)
         t_ety.pack(fill=tk.X, pady=(0, 10))
 
         # Sinonimi/Detti Simili (Navigabili) in un box barra più piccola simile all'etimologia
         lbl_links_title = "Sinonimi (Navigabili):" if is_word else "Detti Simili (Navigabili):"
-        ctk.CTkLabel(f_edit, text=lbl_links_title, font=ctk.CTkFont(family="System", size=12)).pack(anchor=tk.W, pady=(5, 2))
+        ctk.CTkLabel(f_edit, text=lbl_links_title, font=ctk.CTkFont(family="Helvetica", size=12)).pack(anchor=tk.W, pady=(5, 2))
         
         links_box_frame = ctk.CTkFrame(f_edit, height=90)
         links_box_frame.pack(fill=tk.X, pady=(0, 10))
@@ -188,8 +191,8 @@ class ItemTab:
 
         # Modifica Sinonimi/Detti Simili (testo separato da virgola)
         lbl_links = "Modifica Sinonimi (separati da virgola):" if is_word else "Modifica Detti Simili (separati da virgola):"
-        ctk.CTkLabel(f_edit, text=lbl_links, font=ctk.CTkFont(family="System", size=12)).pack(anchor=tk.W, pady=(5, 2))
-        e_links = ctk.CTkEntry(f_edit, font=("System", 13))
+        ctk.CTkLabel(f_edit, text=lbl_links, font=ctk.CTkFont(family="Helvetica", size=12)).pack(anchor=tk.W, pady=(5, 2))
+        e_links = ctk.CTkEntry(f_edit, font=("Helvetica", 13))
         e_links.pack(fill=tk.X, pady=(0, 15))
 
         # Pulsanti CRUD posizionati in fondo all'editor
@@ -228,6 +231,8 @@ class ItemTab:
         border_color = "#2c2c2e" if is_dark else "#e5e5ea"
         text_color_links = "#0a84ff" if is_dark else "#007aff"
 
+        f_gen = self.db.settings.get("font_size_general", 13)
+
         for name, listbox in [("list", self.ui["list"]), ("links", self.ui["links"])]:
             listbox.config(
                 bg=bg_color,
@@ -239,7 +244,7 @@ class ItemTab:
                 highlightthickness=1,
                 highlightbackground=border_color,
                 highlightcolor="#007aff",
-                font=("System", 13)
+                font=("Helvetica", f_gen)
             )
 
     # ── Refresh lista ──────────────────────────────────────────────
@@ -369,10 +374,12 @@ class ItemTab:
     def _dictionary_lookup(self, word):
         candidates = [
             os.path.join(BASE_DIR, "dictionary.db"),
+            os.path.abspath(os.path.join(BASE_DIR, "..", "dictionary.db")),
             os.path.join(BASE_DIR, "dist", "dictionary.db"),
         ]
         db_path = next((p for p in candidates if os.path.exists(p)), None)
         if not db_path:
+            debug_log(f"Lookup dizionario saltato: dictionary.db non trovato. Candidati: {candidates}")
             return
         
         word_lower = word.lower().strip()
@@ -454,3 +461,41 @@ class ItemTab:
                     self.ui["ety"].insert(tk.END, row[1] if row[1] else "")
         except Exception as e:
             debug_log(f"Dictionary lookup error: {e}")
+
+    def update_fonts(self):
+        f_gen = self.db.settings.get("font_size_general", 13)
+        f_mean = self.db.settings.get("font_size_meaning", 18)
+
+        font_gen = ctk.CTkFont(family="Helvetica", size=f_gen)
+        font_bold = ctk.CTkFont(family="Helvetica", size=f_gen + 1, weight="bold")
+        font_mean = ctk.CTkFont(family="Helvetica", size=f_mean)
+
+        debug_log(f"update_fonts [{self.item_type}]: general={f_gen}, meaning={f_mean}")
+        self._apply_fonts_recursive(self.parent_frame, font_gen, font_bold, font_mean)
+        self._style_listboxes()
+
+    def _apply_fonts_recursive(self, widget, font_gen, font_bold, font_mean):
+        try:
+            w_class = widget.__class__.__name__
+            if w_class == "CTkLabel":
+                if self.ui.get("title") and str(widget) == str(self.ui.get("title")):
+                    widget.configure(font=ctk.CTkFont(family="Helvetica", size=font_mean.cget("size") + 20, weight="bold"))
+                else:
+                    widget.configure(font=font_gen)
+            elif w_class == "CTkButton":
+                widget.configure(font=font_gen)
+            elif w_class == "CTkEntry":
+                widget.configure(font=font_gen)
+            elif w_class == "CTkTextbox":
+                if (self.ui.get("def") and str(widget) == str(self.ui.get("def"))) or (self.ui.get("ety") and str(widget) == str(self.ui.get("ety"))):
+                    widget.configure(font=font_mean)
+                else:
+                    widget.configure(font=font_gen)
+            elif w_class == "CTkScrollableFrame":
+                widget.configure(label_font=font_bold)
+        except Exception as e:
+            debug_log(f"Error in _apply_fonts_recursive: {e}")
+
+        for child in widget.winfo_children():
+            self._apply_fonts_recursive(child, font_gen, font_bold, font_mean)
+

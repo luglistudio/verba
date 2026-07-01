@@ -29,10 +29,10 @@ class SpacedTab:
         # 1. Start Frame
         self.spaced_start_frame = ctk.CTkFrame(self.spaced_container, fg_color="transparent")
 
-        self.lbl_spaced_title = ctk.CTkLabel(self.spaced_start_frame, text="Spaced Repetition (SM-2)", font=ctk.CTkFont(family="System", size=20, weight="bold"))
+        self.lbl_spaced_title = ctk.CTkLabel(self.spaced_start_frame, text="Spaced Repetition (SM-2)", font=ctk.CTkFont(family="Helvetica", size=20, weight="bold"))
         self.lbl_spaced_title.pack(pady=(20, 10))
 
-        self.lbl_spaced_summary = ctk.CTkLabel(self.spaced_start_frame, text="Calcolo elementi in corso...", font=ctk.CTkFont(family="System", size=14))
+        self.lbl_spaced_summary = ctk.CTkLabel(self.spaced_start_frame, text="Calcolo elementi in corso...", font=ctk.CTkFont(family="Helvetica", size=14))
         self.lbl_spaced_summary.pack(pady=(0, 20))
 
         self.btn_start_spaced = ctk.CTkButton(self.spaced_start_frame, text="Inizia Ripasso", command=self.start_session)
@@ -47,26 +47,26 @@ class SpacedTab:
         self.btn_exit_spaced = ctk.CTkButton(self.spaced_nav_frame, text="Termina Sessione ❌", fg_color="#ff3b30", hover_color="#dc3545", text_color="#ffffff", command=self.exit_session)
         self.btn_exit_spaced.pack(side=tk.RIGHT)
 
-        self.lbl_spaced_progress = ctk.CTkLabel(self.spaced_session_frame, text="Elemento 0 di 0", font=ctk.CTkFont(family="System", size=12, slant="italic"))
+        self.lbl_spaced_progress = ctk.CTkLabel(self.spaced_session_frame, text="Elemento 0 di 0", font=ctk.CTkFont(family="Helvetica", size=12, slant="italic"))
         self.lbl_spaced_progress.pack(anchor=tk.W, pady=(0, 5))
 
         # Card Front
         self.card_front_frame = ctk.CTkFrame(self.spaced_session_frame)
         self.card_front_frame.pack(fill=tk.X, pady=10, ipady=15)
 
-        lbl_front_hdr = ctk.CTkLabel(self.card_front_frame, text="Fronte della Carta", font=ctk.CTkFont(family="System", size=12, weight="bold"), text_color="#8e8e93")
+        lbl_front_hdr = ctk.CTkLabel(self.card_front_frame, text="Fronte della Carta", font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"), text_color="#8e8e93")
         lbl_front_hdr.pack(anchor=tk.W, padx=15, pady=(10, 5))
 
         f_card_title = ctk.CTkFrame(self.card_front_frame, fg_color="transparent")
         f_card_title.pack(pady=10)
 
-        self.lbl_card_word = ctk.CTkLabel(f_card_title, text="Parola", font=ctk.CTkFont(family="System", size=24, weight="bold"))
+        self.lbl_card_word = ctk.CTkLabel(f_card_title, text="Parola", font=ctk.CTkFont(family="Helvetica", size=24, weight="bold"))
         self.lbl_card_word.pack(side=tk.LEFT)
 
-        self.btn_card_speak = ctk.CTkButton(f_card_title, text="🔊", width=36, height=36, font=ctk.CTkFont(family="System", size=14), command=self._speak_card_word)
+        self.btn_card_speak = ctk.CTkButton(f_card_title, text="🔊", width=36, height=36, font=ctk.CTkFont(family="Helvetica", size=14), command=self._speak_card_word)
         self.btn_card_speak.pack(side=tk.LEFT, padx=15)
 
-        self.lbl_card_type = ctk.CTkLabel(self.card_front_frame, text="Tipo: parola", font=ctk.CTkFont(family="System", size=11, slant="italic"))
+        self.lbl_card_type = ctk.CTkLabel(self.card_front_frame, text="Tipo: parola", font=ctk.CTkFont(family="Helvetica", size=11, slant="italic"))
         self.lbl_card_type.pack(pady=(0, 10))
 
         self.btn_show_answer = ctk.CTkButton(self.card_front_frame, text="Mostra Significato", command=self._show_answer)
@@ -75,16 +75,16 @@ class SpacedTab:
         # Card Back (inizialmente nascosta)
         self.card_back_frame = ctk.CTkFrame(self.spaced_session_frame)
 
-        lbl_back_hdr = ctk.CTkLabel(self.card_back_frame, text="Significato ed Etimologia", font=ctk.CTkFont(family="System", size=12, weight="bold"), text_color="#8e8e93")
+        lbl_back_hdr = ctk.CTkLabel(self.card_back_frame, text="Significato ed Etimologia", font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"), text_color="#8e8e93")
         lbl_back_hdr.pack(anchor=tk.W, padx=15, pady=(10, 5))
 
-        self.txt_card_back = ctk.CTkTextbox(self.card_back_frame, wrap=tk.WORD, font=("System", 13), height=140)
+        self.txt_card_back = ctk.CTkTextbox(self.card_back_frame, wrap=tk.WORD, font=("Helvetica", 13), height=140)
         self.txt_card_back.pack(fill=tk.BOTH, expand=True, padx=15, pady=(0, 15))
 
         # Evaluation Frame (Likert) (inizialmente nascosto)
         self.spaced_eval_frame = ctk.CTkFrame(self.spaced_session_frame, fg_color="transparent")
 
-        self.lbl_eval_title = ctk.CTkLabel(self.spaced_eval_frame, text="Come hai ricordato questo termine? (Scala Likert)", font=ctk.CTkFont(family="System", size=13, weight="bold"))
+        self.lbl_eval_title = ctk.CTkLabel(self.spaced_eval_frame, text="Come hai ricordato questo termine? (Scala Likert)", font=ctk.CTkFont(family="Helvetica", size=13, weight="bold"))
         self.lbl_eval_title.pack(anchor=tk.W, pady=(0, 10))
 
         self.eval_buttons_frame = ctk.CTkFrame(self.spaced_eval_frame, fg_color="transparent")
@@ -118,7 +118,7 @@ class SpacedTab:
             btn = ctk.CTkButton(
                 self.eval_buttons_frame,
                 text=f"{grade}\n{desc}",
-                font=ctk.CTkFont(family="System", size=12, weight="bold"),
+                font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"),
                 fg_color=bg,
                 hover_color=hover,
                 text_color=fg,
@@ -232,3 +232,34 @@ class SpacedTab:
             name, item_type, info = self.due_items[self.current_due_idx]
             pron = info['metadata'].get('pronuncia', '').strip()
             TTS.speak(pron if pron else name)
+
+    def update_fonts(self):
+        f_gen = self.db.settings.get("font_size_general", 13)
+        f_mean = self.db.settings.get("font_size_meaning", 18)
+
+        font_gen = ctk.CTkFont(family="Helvetica", size=f_gen)
+        font_bold = ctk.CTkFont(family="Helvetica", size=f_gen + 1, weight="bold")
+        font_mean = ctk.CTkFont(family="Helvetica", size=f_mean)
+
+        self._apply_fonts_recursive(self.parent_frame, font_gen, font_bold, font_mean)
+
+    def _apply_fonts_recursive(self, widget, font_gen, font_bold, font_mean):
+        try:
+            w_class = widget.__class__.__name__
+            if w_class == "CTkLabel":
+                if getattr(self, "lbl_card_word", None) and str(widget) == str(self.lbl_card_word):
+                    widget.configure(font=ctk.CTkFont(family="Helvetica", size=font_gen.cget("size") + 11, weight="bold"))
+                else:
+                    widget.configure(font=font_gen)
+            elif w_class == "CTkButton":
+                widget.configure(font=font_gen)
+            elif w_class == "CTkEntry":
+                widget.configure(font=font_gen)
+            elif w_class == "CTkTextbox":
+                widget.configure(font=font_mean)
+        except Exception:
+            pass
+
+        for child in widget.winfo_children():
+            self._apply_fonts_recursive(child, font_gen, font_bold, font_mean)
+

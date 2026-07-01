@@ -39,15 +39,18 @@ class TutorTab:
         self.quiz_score = 0
         self.quiz_answers_checked = False
 
-        self._setup_layout()
+        # Reset visual state safely on the main thread
+        def reset_ui():
+            try:
+                self.quiz_container_frame.pack_forget()
+                self.chat_container_frame.pack(fill=tk.BOTH, expand=True)
+            except Exception:
+                pass
+        self._enqueue_ui(reset_ui)
 
     # ── Layout ─────────────────────────────────────────────────────
 
     def _setup_layout(self):
-        # Ripulisce eventuali widget esistenti se viene resettata la sessione
-        for widget in self.parent_frame.winfo_children():
-            widget.destroy()
-
         top_frame = ctk.CTkFrame(self.parent_frame, fg_color="transparent")
         top_frame.pack(fill=tk.X, pady=10, padx=10)
 
@@ -68,13 +71,13 @@ class TutorTab:
         chat_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
         # CTkTextbox ha le scrollbar integrate ed è molto più pulito
-        self.tutor_chat = ctk.CTkTextbox(chat_frame, wrap=tk.WORD, font=("System", 14), state=tk.DISABLED)
+        self.tutor_chat = ctk.CTkTextbox(chat_frame, wrap=tk.WORD, font=("Helvetica", 14), state=tk.DISABLED)
         self.tutor_chat.pack(fill=tk.BOTH, expand=True)
 
         bottom_frame = ctk.CTkFrame(self.chat_container_frame, fg_color="transparent")
         bottom_frame.pack(fill=tk.X, pady=10, padx=10)
 
-        self.tutor_input = ctk.CTkEntry(bottom_frame, font=("System", 14), placeholder_text="Scrivi al Tutor...")
+        self.tutor_input = ctk.CTkEntry(bottom_frame, font=("Helvetica", 14), placeholder_text="Scrivi al Tutor...")
         self.tutor_input.pack(side=tk.LEFT, fill=tk.X, expand=True)
         self.tutor_input.bind("<Return>", lambda e: self.send_tutor_msg())
 
@@ -86,10 +89,10 @@ class TutorTab:
 
         self.quiz_header_frame = ctk.CTkFrame(self.quiz_container_frame, fg_color="transparent")
         self.quiz_header_frame.pack(fill=tk.X, pady=(10, 5), padx=15)
-        self.quiz_progress_lbl = ctk.CTkLabel(self.quiz_header_frame, text="Domanda 0 di 0 | Punteggio: 0/0", font=ctk.CTkFont(family="System", size=14, weight="bold"))
+        self.quiz_progress_lbl = ctk.CTkLabel(self.quiz_header_frame, text="Domanda 0 di 0 | Punteggio: 0/0", font=ctk.CTkFont(family="Helvetica", size=14, weight="bold"))
         self.quiz_progress_lbl.pack(side=tk.LEFT)
 
-        self.quiz_question_lbl = ctk.CTkLabel(self.quiz_container_frame, text="Domanda...", font=ctk.CTkFont(family="System", size=16), justify=tk.LEFT, anchor=tk.W)
+        self.quiz_question_lbl = ctk.CTkLabel(self.quiz_container_frame, text="Domanda...", font=ctk.CTkFont(family="Helvetica", size=16), justify=tk.LEFT, anchor=tk.W)
         self.quiz_question_lbl.pack(fill=tk.X, pady=15, padx=15)
 
         self.quiz_options_frame = ctk.CTkFrame(self.quiz_container_frame, fg_color="transparent")
@@ -100,7 +103,7 @@ class TutorTab:
             btn = ctk.CTkButton(
                 self.quiz_options_frame,
                 text=f"Opzione {i+1}",
-                font=ctk.CTkFont(family="System", size=13),
+                font=ctk.CTkFont(family="Helvetica", size=13),
                 anchor="w",
                 height=45,
                 command=lambda idx=i: self.select_quiz_option(idx)
@@ -113,9 +116,9 @@ class TutorTab:
         self.quiz_feedback_frame = ctk.CTkFrame(self.quiz_container_frame)
         self.quiz_feedback_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=10)
 
-        self.quiz_rationale_lbl = ctk.CTkLabel(self.quiz_feedback_frame, text="Spiegazione:", font=ctk.CTkFont(family="System", size=12, weight="bold"))
+        self.quiz_rationale_lbl = ctk.CTkLabel(self.quiz_feedback_frame, text="Spiegazione:", font=ctk.CTkFont(family="Helvetica", size=12, weight="bold"))
         self.quiz_rationale_lbl.pack(anchor=tk.W, padx=10, pady=(5, 2))
-        self.quiz_rationale_txt = ctk.CTkTextbox(self.quiz_feedback_frame, wrap=tk.WORD, font=("System", 13), height=100, state=tk.DISABLED)
+        self.quiz_rationale_txt = ctk.CTkTextbox(self.quiz_feedback_frame, wrap=tk.WORD, font=("Helvetica", 13), height=100, state=tk.DISABLED)
         self.quiz_rationale_txt.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
         self.quiz_nav_frame = ctk.CTkFrame(self.quiz_container_frame, fg_color="transparent")
@@ -654,3 +657,34 @@ class TutorTab:
         self.btn_send.configure(state=tk.NORMAL)
         self.btn_quiz_def.configure(state=tk.NORMAL)
         self.btn_quiz_fill.configure(state=tk.NORMAL)
+
+    def update_fonts(self):
+        f_gen = self.db.settings.get("font_size_general", 13)
+        f_mean = self.db.settings.get("font_size_meaning", 18)
+
+        font_gen = ctk.CTkFont(family="Helvetica", size=f_gen)
+        font_bold = ctk.CTkFont(family="Helvetica", size=f_gen + 1, weight="bold")
+        font_mean = ctk.CTkFont(family="Helvetica", size=f_mean)
+
+        self._apply_fonts_recursive(self.parent_frame, font_gen, font_bold, font_mean)
+
+    def _apply_fonts_recursive(self, widget, font_gen, font_bold, font_mean):
+        try:
+            w_class = widget.__class__.__name__
+            if w_class == "CTkLabel":
+                if getattr(self, "quiz_question_lbl", None) and str(widget) == str(self.quiz_question_lbl):
+                    widget.configure(font=ctk.CTkFont(family="Helvetica", size=font_gen.cget("size") + 3))
+                else:
+                    widget.configure(font=font_gen)
+            elif w_class == "CTkButton":
+                widget.configure(font=font_gen)
+            elif w_class == "CTkEntry":
+                widget.configure(font=font_gen)
+            elif w_class == "CTkTextbox":
+                widget.configure(font=font_mean)
+        except Exception:
+            pass
+
+        for child in widget.winfo_children():
+            self._apply_fonts_recursive(child, font_gen, font_bold, font_mean)
+

@@ -31,3 +31,5 @@ config.json
 *.json.bak
 wiki/
 .obsidian/
+inspect_widgets.py
+scratch/

@@ -13,8 +13,33 @@ class WordDatabase:
         self.directory = directory
         self.words = {}
         self.sayings = {}
+        self.settings_path = os.path.join(self.directory, "settings.json")
+        self.settings = self._load_settings()
         os.makedirs(self.directory, exist_ok=True)
         self._init_data()
+
+    def _load_settings(self):
+        default_settings = {
+            "font_size_meaning": 18,
+            "font_size_general": 13
+        }
+        if os.path.exists(self.settings_path):
+            try:
+                import json
+                with open(self.settings_path, 'r', encoding='utf-8') as f:
+                    return {**default_settings, **json.load(f)}
+            except Exception:
+                pass
+        return default_settings
+
+    def save_settings(self, settings):
+        self.settings.update(settings)
+        try:
+            import json
+            with open(self.settings_path, 'w', encoding='utf-8') as f:
+                json.dump(self.settings, f, indent=4)
+        except Exception:
+            pass
 
     def _init_data(self):
         """Singola passata: migrazione + caricamento in memoria."""
