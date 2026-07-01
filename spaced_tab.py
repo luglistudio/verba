@@ -1,8 +1,9 @@
-"""Tab Spaced Repetition — sessioni di ripasso con algoritmo SM-2."""
+"""Tab Spaced Repetition — sessioni di ripasso con algoritmo SM-2 usando CustomTkinter."""
 
 from datetime import datetime
 import tkinter as tk
-from tkinter import ttk, messagebox
+import customtkinter as ctk
+from tkinter import messagebox
 
 from tts import TTS
 
@@ -22,65 +23,71 @@ class SpacedTab:
     # ── Layout ─────────────────────────────────────────────────────
 
     def _setup_layout(self):
-        self.spaced_container = ttk.Frame(self.parent_frame, padding="15")
-        self.spaced_container.pack(fill=tk.BOTH, expand=True)
+        self.spaced_container = ctk.CTkFrame(self.parent_frame, fg_color="transparent")
+        self.spaced_container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
 
         # 1. Start Frame
-        self.spaced_start_frame = ttk.Frame(self.spaced_container)
+        self.spaced_start_frame = ctk.CTkFrame(self.spaced_container, fg_color="transparent")
 
-        self.lbl_spaced_title = ttk.Label(self.spaced_start_frame, text="Spaced Repetition (SM-2)", font=("System", 18, "bold"))
-        self.lbl_spaced_title.pack(pady=(0, 20))
+        self.lbl_spaced_title = ctk.CTkLabel(self.spaced_start_frame, text="Spaced Repetition (SM-2)", font=ctk.CTkFont(family="System", size=20, weight="bold"))
+        self.lbl_spaced_title.pack(pady=(20, 10))
 
-        self.lbl_spaced_summary = ttk.Label(self.spaced_start_frame, text="Calcolo elementi in corso...", font=("System", 14))
+        self.lbl_spaced_summary = ctk.CTkLabel(self.spaced_start_frame, text="Calcolo elementi in corso...", font=ctk.CTkFont(family="System", size=14))
         self.lbl_spaced_summary.pack(pady=(0, 20))
 
-        self.btn_start_spaced = ttk.Button(self.spaced_start_frame, text="Inizia Ripasso", command=self.start_session)
+        self.btn_start_spaced = ctk.CTkButton(self.spaced_start_frame, text="Inizia Ripasso", command=self.start_session)
         self.btn_start_spaced.pack(pady=10)
 
         # 2. Session Frame
-        self.spaced_session_frame = ttk.Frame(self.spaced_container)
+        self.spaced_session_frame = ctk.CTkFrame(self.spaced_container, fg_color="transparent")
 
-        self.spaced_nav_frame = ttk.Frame(self.spaced_session_frame)
-        self.spaced_nav_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=(10, 0))
+        self.spaced_nav_frame = ctk.CTkFrame(self.spaced_session_frame, fg_color="transparent")
+        self.spaced_nav_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=(15, 0))
 
-        self.btn_exit_spaced = ttk.Button(self.spaced_nav_frame, text="Termina Sessione ❌", command=self.exit_session)
+        self.btn_exit_spaced = ctk.CTkButton(self.spaced_nav_frame, text="Termina Sessione ❌", fg_color="#ff3b30", hover_color="#dc3545", text_color="#ffffff", command=self.exit_session)
         self.btn_exit_spaced.pack(side=tk.RIGHT)
 
-        self.lbl_spaced_progress = ttk.Label(self.spaced_session_frame, text="Elemento 0 di 0", font=("System", 12, "italic"))
+        self.lbl_spaced_progress = ctk.CTkLabel(self.spaced_session_frame, text="Elemento 0 di 0", font=ctk.CTkFont(family="System", size=12, slant="italic"))
         self.lbl_spaced_progress.pack(anchor=tk.W, pady=(0, 5))
 
         # Card Front
-        self.card_front_frame = ttk.LabelFrame(self.spaced_session_frame, text="Fronte della Carta", padding="15")
-        self.card_front_frame.pack(fill=tk.X, pady=5)
+        self.card_front_frame = ctk.CTkFrame(self.spaced_session_frame)
+        self.card_front_frame.pack(fill=tk.X, pady=10, ipady=15)
 
-        f_card_title = ttk.Frame(self.card_front_frame)
+        lbl_front_hdr = ctk.CTkLabel(self.card_front_frame, text="Fronte della Carta", font=ctk.CTkFont(family="System", size=12, weight="bold"), text_color="#8e8e93")
+        lbl_front_hdr.pack(anchor=tk.W, padx=15, pady=(10, 5))
+
+        f_card_title = ctk.CTkFrame(self.card_front_frame, fg_color="transparent")
         f_card_title.pack(pady=10)
 
-        self.lbl_card_word = ttk.Label(f_card_title, text="Parola", font=("System", 22, "bold"))
+        self.lbl_card_word = ctk.CTkLabel(f_card_title, text="Parola", font=ctk.CTkFont(family="System", size=24, weight="bold"))
         self.lbl_card_word.pack(side=tk.LEFT)
 
-        self.btn_card_speak = ttk.Button(f_card_title, text="🔊", width=3, command=self._speak_card_word)
-        self.btn_card_speak.pack(side=tk.LEFT, padx=10)
+        self.btn_card_speak = ctk.CTkButton(f_card_title, text="🔊", width=36, height=36, font=ctk.CTkFont(family="System", size=14), command=self._speak_card_word)
+        self.btn_card_speak.pack(side=tk.LEFT, padx=15)
 
-        self.lbl_card_type = ttk.Label(self.card_front_frame, text="Tipo: parola", font=("System", 11, "italic"))
-        self.lbl_card_type.pack()
+        self.lbl_card_type = ctk.CTkLabel(self.card_front_frame, text="Tipo: parola", font=ctk.CTkFont(family="System", size=11, slant="italic"))
+        self.lbl_card_type.pack(pady=(0, 10))
 
-        self.btn_show_answer = ttk.Button(self.card_front_frame, text="Mostra Significato", command=self._show_answer)
+        self.btn_show_answer = ctk.CTkButton(self.card_front_frame, text="Mostra Significato", command=self._show_answer)
         self.btn_show_answer.pack(pady=10)
 
-        # Card Back
-        self.card_back_frame = ttk.LabelFrame(self.spaced_session_frame, text="Significato ed Etimologia", padding="15")
+        # Card Back (inizialmente nascosta)
+        self.card_back_frame = ctk.CTkFrame(self.spaced_session_frame)
 
-        self.txt_card_back = tk.Text(self.card_back_frame, wrap=tk.WORD, font=("System", 13), height=6, state=tk.DISABLED)
-        self.txt_card_back.pack(fill=tk.BOTH, expand=True, pady=5)
+        lbl_back_hdr = ctk.CTkLabel(self.card_back_frame, text="Significato ed Etimologia", font=ctk.CTkFont(family="System", size=12, weight="bold"), text_color="#8e8e93")
+        lbl_back_hdr.pack(anchor=tk.W, padx=15, pady=(10, 5))
 
-        # Evaluation Frame (Likert)
-        self.spaced_eval_frame = ttk.Frame(self.spaced_session_frame)
+        self.txt_card_back = ctk.CTkTextbox(self.card_back_frame, wrap=tk.WORD, font=("System", 13), height=140)
+        self.txt_card_back.pack(fill=tk.BOTH, expand=True, padx=15, pady=(0, 15))
 
-        self.lbl_eval_title = ttk.Label(self.spaced_eval_frame, text="Come hai ricordato questo termine? (Scala Likert)", font=("System", 12, "bold"))
-        self.lbl_eval_title.pack(anchor=tk.W, pady=(0, 5))
+        # Evaluation Frame (Likert) (inizialmente nascosto)
+        self.spaced_eval_frame = ctk.CTkFrame(self.spaced_session_frame, fg_color="transparent")
 
-        self.eval_buttons_frame = ttk.Frame(self.spaced_eval_frame)
+        self.lbl_eval_title = ctk.CTkLabel(self.spaced_eval_frame, text="Come hai ricordato questo termine? (Scala Likert)", font=ctk.CTkFont(family="System", size=13, weight="bold"))
+        self.lbl_eval_title.pack(anchor=tk.W, pady=(0, 10))
+
+        self.eval_buttons_frame = ctk.CTkFrame(self.spaced_eval_frame, fg_color="transparent")
         self.eval_buttons_frame.pack(fill=tk.X)
 
         for col_idx in range(6):
@@ -95,29 +102,30 @@ class SpacedTab:
             ("5", "Ottimo")
         ]
 
+        # Colori coordinati ed eleganti per i bottoni di valutazione
         colors = [
-            "#ffdddd",  # 0: Buio (Rosso)
-            "#ffe6cc",  # 1: Quasi (Arancione)
-            "#fffae6",  # 2: Errato (Giallo)
-            "#e6f9ff",  # 3: Fatica (Azzurro)
-            "#eafaf1",  # 4: Bene (Verde chiaro)
-            "#d5f5e3"   # 5: Ottimo (Verde brillante)
+            ("#ff3b30", "#dc3545", "#ffffff"),  # 0: Buio (Rosso)
+            ("#ff9500", "#f57c00", "#ffffff"),  # 1: Quasi (Arancione)
+            ("#ffcc00", "#fbc02d", "#000000"),  # 2: Errato (Giallo)
+            ("#5ac8fa", "#0097a7", "#000000"),  # 3: Fatica (Azzurro)
+            ("#34c759", "#388e3c", "#ffffff"),  # 4: Bene (Verde chiaro)
+            ("#248a3d", "#1b652c", "#ffffff")   # 5: Ottimo (Verde brillante)
         ]
 
         self.spaced_eval_buttons = []
         for i, (grade, desc) in enumerate(eval_grades):
-            btn = tk.Button(
+            bg, hover, fg = colors[i]
+            btn = ctk.CTkButton(
                 self.eval_buttons_frame,
                 text=f"{grade}\n{desc}",
-                font=("System", 10, "bold"),
-                padx=5,
-                pady=5,
-                bg=colors[i],
-                fg="#212529",
-                highlightbackground=colors[i],
+                font=ctk.CTkFont(family="System", size=12, weight="bold"),
+                fg_color=bg,
+                hover_color=hover,
+                text_color=fg,
+                height=50,
                 command=lambda g=i: self._submit_grade(g)
             )
-            btn.grid(row=0, column=i, sticky="nsew", padx=2, pady=2)
+            btn.grid(row=0, column=i, sticky="nsew", padx=3, pady=2)
             self.spaced_eval_buttons.append(btn)
 
         self.show_start_screen()
@@ -155,11 +163,11 @@ class SpacedTab:
         n_due = len(self.due_items)
 
         if n_due == 0:
-            self.lbl_spaced_summary.config(text="Ottimo lavoro! Non ci sono elementi da ripassare per oggi. 🎉")
-            self.btn_start_spaced.config(state=tk.DISABLED)
+            self.lbl_spaced_summary.configure(text="Ottimo lavoro! Non ci sono elementi da ripassare per oggi. 🎉")
+            self.btn_start_spaced.configure(state=tk.DISABLED)
         else:
-            self.lbl_spaced_summary.config(text=f"Elementi da ripassare oggi: {n_due}")
-            self.btn_start_spaced.config(state=tk.NORMAL)
+            self.lbl_spaced_summary.configure(text=f"Elementi da ripassare oggi: {n_due}")
+            self.btn_start_spaced.configure(state=tk.NORMAL)
 
     def start_session(self):
         self.due_items = self._get_due_items()
@@ -179,11 +187,11 @@ class SpacedTab:
             return
 
         name, item_type, info = self.due_items[self.current_due_idx]
-        self.lbl_spaced_progress.config(text=f"Elemento {self.current_due_idx + 1} di {len(self.due_items)}")
+        self.lbl_spaced_progress.configure(text=f"Elemento {self.current_due_idx + 1} di {len(self.due_items)}")
 
         prefix = "Parola" if item_type == "word" else "Detto"
-        self.lbl_card_word.config(text=name)
-        self.lbl_card_type.config(text=f"Tipo: {prefix}")
+        self.lbl_card_word.configure(text=name)
+        self.lbl_card_type.configure(text=f"Tipo: {prefix}")
 
         self.card_back_frame.pack_forget()
         self.spaced_eval_frame.pack_forget()
@@ -201,10 +209,10 @@ class SpacedTab:
             links_lbl = "🔗 SINONIMI:" if item_type == "word" else "🔗 DETTI SIMILI:"
             back_text += f"\n{links_lbl} {', '.join(info['synonyms'])}\n"
 
-        self.txt_card_back.config(state=tk.NORMAL)
-        self.txt_card_back.delete(1.0, tk.END)
+        self.txt_card_back.configure(state=tk.NORMAL)
+        self.txt_card_back.delete("1.0", tk.END)
         self.txt_card_back.insert(tk.END, back_text)
-        self.txt_card_back.config(state=tk.DISABLED)
+        self.txt_card_back.configure(state=tk.DISABLED)
 
         self.card_back_frame.pack(fill=tk.BOTH, expand=False, pady=5)
         self.spaced_eval_frame.pack(fill=tk.X, pady=5)

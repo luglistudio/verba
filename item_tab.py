@@ -1,19 +1,20 @@
-"""Tab condiviso per Parole e Detti — UI + logica CRUD."""
+"""Tab condiviso per Parole e Detti — UI + logica CRUD con CustomTkinter."""
 
 import os
 import re
 import sqlite3
 import tkinter as tk
-from tkinter import ttk, messagebox, simpledialog
+import customtkinter as ctk
+from tkinter import messagebox
 
 from constants import BASE_DIR, debug_log
 from tts import TTS
 
 
-class SuggestionDialog(tk.Toplevel):
+class SuggestionDialog(ctk.CTkToplevel):
     def __init__(self, parent, suggestions):
         super().__init__(parent)
-        self.title("Suggerimenti Dizionario")
+        self.title("Suggerimenti")
         self.geometry("380x320")
         self.resizable(False, False)
         self.transient(parent)
@@ -34,37 +35,62 @@ class SuggestionDialog(tk.Toplevel):
         self.selected_word = None
 
         # Widgets
-        main_frame = ttk.Frame(self, padding="15")
-        main_frame.pack(fill=tk.BOTH, expand=True)
+        main_frame = ctk.CTkFrame(self, fg_color="transparent")
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
 
-        lbl = ttk.Label(main_frame, text="Parola non trovata. Forse cercavi:", font=("System", 13, "bold"))
+        lbl = ctk.CTkLabel(main_frame, text="Parola non trovata. Forse cercavi:", font=ctk.CTkFont(family="System", size=13, weight="bold"))
         lbl.pack(anchor=tk.W, pady=(0, 10))
 
-        list_frame = ttk.Frame(main_frame)
+        list_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
         list_frame.pack(fill=tk.BOTH, expand=True)
 
-        scrollbar = ttk.Scrollbar(list_frame)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        is_dark = ctk.get_appearance_mode() == "Dark"
+        bg_color = "#1c1c1e" if is_dark else "#ffffff"
+        fg_color = "#ffffff" if is_dark else "#000000"
+        border_color = "#2c2c2e" if is_dark else "#e5e5ea"
 
-        self.listbox = tk.Listbox(list_frame, yscrollcommand=scrollbar.set, font=("System", 13), selectbackground="#007aff")
+        self.listbox = tk.Listbox(
+            list_frame,
+            bg=bg_color,
+            fg=fg_color,
+            selectbackground="#007aff",
+            selectforeground="#ffffff",
+            relief=tk.FLAT,
+            borderwidth=0,
+            highlightthickness=1,
+            highlightbackground=border_color,
+            highlightcolor="#007aff",
+            font=("System", 13),
+            exportselection=False
+        )
         self.listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        scrollbar.config(command=self.listbox.yview)
+
+        scrollbar = ctk.CTkScrollbar(list_frame, command=self.listbox.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y, padx=(5, 0))
+        self.listbox.config(yscrollcommand=scrollbar.set)
 
         for item in suggestions:
             self.listbox.insert(tk.END, item)
 
         self.listbox.bind("<Double-Button-1>", lambda e: self._on_select())
 
-        btn_frame = ttk.Frame(main_frame)
+        btn_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
         btn_frame.pack(fill=tk.X, pady=(15, 0))
 
-        btn_select = ttk.Button(btn_frame, text="Seleziona", command=self._on_select)
+        btn_select = ctk.CTkButton(btn_frame, text="Seleziona", width=90, command=self._on_select)
         btn_select.pack(side=tk.RIGHT, padx=(5, 0))
 
-        btn_cancel = ttk.Button(btn_frame, text="Annulla", command=self.destroy)
+        btn_cancel = ctk.CTkButton(
+            btn_frame, 
+            text="Annulla", 
+            width=90, 
+            fg_color="#8e8e93" if is_dark else "#c7c7cc", 
+            hover_color="#636366" if is_dark else "#aeaeae", 
+            text_color="#ffffff" if is_dark else "#000000",
+            command=self.destroy
+        )
         btn_cancel.pack(side=tk.RIGHT)
 
-        # Focus
         self.listbox.focus_set()
         if suggestions:
             self.listbox.selection_set(0)
@@ -77,7 +103,7 @@ class SuggestionDialog(tk.Toplevel):
 
 
 class ItemTab:
-    """Gestisce un tab (Parole o Detti) con lista, links navigabili e editor."""
+    """Gestisce un tab (Parole o Detti) con lista, links navigabili e editor usando CustomTkinter."""
 
     def __init__(self, parent_frame, db, item_type="word"):
         self.parent_frame = parent_frame
@@ -93,72 +119,93 @@ class ItemTab:
     def _setup_layout(self):
         is_word = self.item_type == "word"
 
-        paned = ttk.PanedWindow(self.parent_frame, orient=tk.HORIZONTAL)
-        paned.pack(fill=tk.BOTH, expand=True, pady=10)
+        # Grid-based layout per una spaziatura e allineamento perfetti
+        grid_frame = ctk.CTkFrame(self.parent_frame, fg_color="transparent")
+        grid_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        grid_frame.columnconfigure(0, weight=2)
+        grid_frame.columnconfigure(1, weight=2)
+        grid_frame.columnconfigure(2, weight=4)
+        grid_frame.rowconfigure(0, weight=1)
 
         # Colonna 1: Lista completa
-        f_list = ttk.Frame(paned)
-        paned.add(f_list, weight=2)
+        f_list = ctk.CTkFrame(grid_frame, fg_color="transparent")
+        f_list.grid(row=0, column=0, sticky="nsew", padx=5)
+        
         title_list = "Tutte le Parole" if is_word else "Tutti i Detti"
-        ttk.Label(f_list, text=title_list, font=("System", 14, "bold")).pack(anchor=tk.W, pady=(0, 5))
-        s_list = ttk.Scrollbar(f_list)
-        s_list.pack(side=tk.RIGHT, fill=tk.Y)
-        l_list = tk.Listbox(f_list, yscrollcommand=s_list.set, exportselection=False, font=("System", 13))
+        ctk.CTkLabel(f_list, text=title_list, font=ctk.CTkFont(family="System", size=14, weight="bold")).pack(anchor=tk.W, pady=(0, 5))
+        
+        list_container = ctk.CTkFrame(f_list, fg_color="transparent")
+        list_container.pack(fill=tk.BOTH, expand=True)
+
+        l_list = tk.Listbox(list_container, exportselection=False)
         l_list.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        s_list.config(command=l_list.yview)
+        
+        s_list = ctk.CTkScrollbar(list_container, command=l_list.yview)
+        s_list.pack(side=tk.RIGHT, fill=tk.Y, padx=(5, 0))
+        l_list.config(yscrollcommand=s_list.set)
         l_list.bind('<<ListboxSelect>>', self._on_select)
 
         # Colonna 2: Links (Sinonimi / Detti Simili)
-        f_links = ttk.Frame(paned)
-        paned.add(f_links, weight=2)
+        f_links = ctk.CTkFrame(grid_frame, fg_color="transparent")
+        f_links.grid(row=0, column=1, sticky="nsew", padx=5)
+        
         title_links = "Sinonimi (Navigabili)" if is_word else "Detti Simili (Navigabili)"
-        ttk.Label(f_links, text=title_links, font=("System", 14, "bold")).pack(anchor=tk.W, pady=(0, 5), padx=10)
-        s_links = ttk.Scrollbar(f_links)
-        s_links.pack(side=tk.RIGHT, fill=tk.Y)
-        l_links = tk.Listbox(f_links, yscrollcommand=s_links.set, exportselection=False, font=("System", 13), fg="blue")
-        l_links.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(10, 0))
-        s_links.config(command=l_links.yview)
+        ctk.CTkLabel(f_links, text=title_links, font=ctk.CTkFont(family="System", size=14, weight="bold")).pack(anchor=tk.W, pady=(0, 5))
+        
+        links_container = ctk.CTkFrame(f_links, fg_color="transparent")
+        links_container.pack(fill=tk.BOTH, expand=True)
+
+        l_links = tk.Listbox(links_container, exportselection=False)
+        l_links.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        s_links = ctk.CTkScrollbar(links_container, command=l_links.yview)
+        s_links.pack(side=tk.RIGHT, fill=tk.Y, padx=(5, 0))
+        l_links.config(yscrollcommand=s_links.set)
         l_links.bind('<<ListboxSelect>>', self._on_link_select)
 
         # Colonna 3: Editor
-        f_edit = ttk.Frame(paned)
-        paned.add(f_edit, weight=4)
-        inner = ttk.Frame(f_edit)
-        inner.pack(fill=tk.BOTH, expand=True, padx=15)
+        f_edit = ctk.CTkScrollableFrame(grid_frame, label_text="Scheda Dettagli" if is_word else "Scheda Detto", label_font=ctk.CTkFont(family="System", size=14, weight="bold"))
+        f_edit.grid(row=0, column=2, sticky="nsew", padx=5)
 
         # Titolo + audio
-        f_title = ttk.Frame(inner)
+        f_title = ctk.CTkFrame(f_edit, fg_color="transparent")
         f_title.pack(anchor=tk.W, fill=tk.X, pady=(0, 10))
 
-        lbl_title = ttk.Label(f_title, text="Nessun elemento", font=("System", 18, "bold"))
+        lbl_title = ctk.CTkLabel(f_title, text="Nessun elemento", font=ctk.CTkFont(family="System", size=18, weight="bold"))
         lbl_title.pack(side=tk.LEFT)
 
-        btn_speak = ttk.Button(f_title, text="Ascolta 🔊", width=10, command=self._speak_current)
+        btn_speak = ctk.CTkButton(f_title, text="Ascolta 🔊", width=80, height=26, font=ctk.CTkFont(family="System", size=12), command=self._speak_current)
         btn_speak.pack(side=tk.LEFT, padx=10)
 
-        ttk.Label(inner, text="Pronuncia (Accenti/Dizione):", font=("System", 12)).pack(anchor=tk.W)
-        e_pron = ttk.Entry(inner, font=("System", 13))
+        ctk.CTkLabel(f_edit, text="Pronuncia (Accenti/Dizione):", font=ctk.CTkFont(family="System", size=12)).pack(anchor=tk.W, pady=(5, 2))
+        e_pron = ctk.CTkEntry(f_edit, font=("System", 13))
         e_pron.pack(fill=tk.X, pady=(0, 10))
 
-        ttk.Label(inner, text="Significato:", font=("System", 12)).pack(anchor=tk.W)
-        t_def = tk.Text(inner, wrap=tk.WORD, font=("System", 13), height=5)
-        t_def.pack(fill=tk.BOTH, expand=True, pady=(0, 5))
+        ctk.CTkLabel(f_edit, text="Significato:", font=ctk.CTkFont(family="System", size=12)).pack(anchor=tk.W, pady=(5, 2))
+        t_def = ctk.CTkTextbox(f_edit, wrap=tk.WORD, font=("System", 13), height=140)
+        t_def.pack(fill=tk.X, pady=(0, 10))
 
-        ttk.Label(inner, text="Etimologia:", font=("System", 12)).pack(anchor=tk.W)
-        t_ety = tk.Text(inner, wrap=tk.WORD, font=("System", 13), height=3)
-        t_ety.pack(fill=tk.BOTH, expand=False, pady=(0, 10))
+        ctk.CTkLabel(f_edit, text="Etimologia:", font=ctk.CTkFont(family="System", size=12)).pack(anchor=tk.W, pady=(5, 2))
+        t_ety = ctk.CTkTextbox(f_edit, wrap=tk.WORD, font=("System", 13), height=100)
+        t_ety.pack(fill=tk.X, pady=(0, 10))
 
         lbl_links = "Sinonimi (separati da virgola):" if is_word else "Detti Simili (separati da virgola):"
-        ttk.Label(inner, text=lbl_links, font=("System", 12)).pack(anchor=tk.W)
-        e_links = ttk.Entry(inner, font=("System", 13))
+        ctk.CTkLabel(f_edit, text=lbl_links, font=ctk.CTkFont(family="System", size=12)).pack(anchor=tk.W, pady=(5, 2))
+        e_links = ctk.CTkEntry(f_edit, font=("System", 13))
         e_links.pack(fill=tk.X, pady=(0, 15))
 
-        f_btns = ttk.Frame(inner)
-        f_btns.pack(fill=tk.X, pady=(0, 10))
+        # Pulsanti CRUD posizionati in fondo all'editor
+        f_btns = ctk.CTkFrame(f_edit, fg_color="transparent")
+        f_btns.pack(fill=tk.X, pady=(10, 0))
 
-        ttk.Button(f_btns, text="Salva Modifiche", command=self.save_current).pack(side=tk.LEFT, padx=(0, 5))
-        ttk.Button(f_btns, text="Elimina", command=self.delete_current).pack(side=tk.LEFT, padx=5)
-        ttk.Button(f_btns, text="Nuovo Elemento", command=self.new_item).pack(side=tk.RIGHT)
+        btn_save = ctk.CTkButton(f_btns, text="Salva Modifiche", fg_color="#34c759", hover_color="#28a745", text_color="#ffffff", command=self.save_current)
+        btn_save.pack(side=tk.LEFT, padx=(0, 5), expand=True, fill=tk.X)
+
+        btn_delete = ctk.CTkButton(f_btns, text="Elimina", fg_color="#ff3b30", hover_color="#dc3545", text_color="#ffffff", command=self.delete_current)
+        btn_delete.pack(side=tk.LEFT, padx=5, expand=True, fill=tk.X)
+
+        btn_new = ctk.CTkButton(f_btns, text="Nuovo Elemento", command=self.new_item)
+        btn_new.pack(side=tk.LEFT, padx=(5, 0), expand=True, fill=tk.X)
 
         self.ui = {
             "list": l_list,
@@ -176,9 +223,31 @@ class ItemTab:
     def _target_dict(self):
         return self.db.words if self.item_type == "word" else self.db.sayings
 
+    def _style_listboxes(self):
+        is_dark = ctk.get_appearance_mode() == "Dark"
+        bg_color = "#1c1c1e" if is_dark else "#ffffff"
+        fg_color = "#ffffff" if is_dark else "#000000"
+        border_color = "#2c2c2e" if is_dark else "#e5e5ea"
+        text_color_links = "#0a84ff" if is_dark else "#007aff"
+
+        for name, listbox in [("list", self.ui["list"]), ("links", self.ui["links"])]:
+            listbox.config(
+                bg=bg_color,
+                fg=text_color_links if name == "links" else fg_color,
+                selectbackground="#007aff",
+                selectforeground="#ffffff",
+                relief=tk.FLAT,
+                borderwidth=0,
+                highlightthickness=1,
+                highlightbackground=border_color,
+                highlightcolor="#007aff",
+                font=("System", 13)
+            )
+
     # ── Refresh lista ──────────────────────────────────────────────
 
     def refresh(self, select_item=None):
+        self._style_listboxes()
         self.ui["list"].delete(0, tk.END)
         for item in sorted(self._target_dict.keys()):
             self.ui["list"].insert(tk.END, item)
@@ -197,17 +266,18 @@ class ItemTab:
     def load_details(self, item_name):
         self.current_item = item_name
         info = self._target_dict.get(item_name)
-        self.ui["title"].config(text=item_name)
+        self.ui["title"].configure(text=item_name)
 
         if info:
-            self.ui["def"].delete(1.0, tk.END)
+            self.ui["def"].delete("1.0", tk.END)
             self.ui["def"].insert(tk.END, info['definition'])
-            self.ui["ety"].delete(1.0, tk.END)
+            self.ui["ety"].delete("1.0", tk.END)
             self.ui["ety"].insert(tk.END, info.get('etymology', ''))
             self.ui["pron"].delete(0, tk.END)
             self.ui["pron"].insert(0, info['metadata'].get('pronuncia', ''))
             self.ui["entry_links"].delete(0, tk.END)
             self.ui["entry_links"].insert(0, ", ".join(info['synonyms']))
+            
             self.ui["links"].delete(0, tk.END)
             for syn in info['synonyms']:
                 self.ui["links"].insert(tk.END, syn)
@@ -229,7 +299,7 @@ class ItemTab:
             if messagebox.askyesno("Navigazione", f"{label} '{syn}' non esiste. Crearlo?"):
                 self.current_item = syn
                 self._clear_editor()
-                self.ui["title"].config(text=syn)
+                self.ui["title"].configure(text=syn)
                 self.ui["def"].focus_set()
                 self.ui["list"].selection_clear(0, tk.END)
 
@@ -238,8 +308,8 @@ class ItemTab:
     def save_current(self):
         if not self.current_item:
             return
-        n_def = self.ui["def"].get(1.0, tk.END).strip()
-        n_ety = self.ui["ety"].get(1.0, tk.END).strip()
+        n_def = self.ui["def"].get("1.0", tk.END).strip()
+        n_ety = self.ui["ety"].get("1.0", tk.END).strip()
         n_pron = self.ui["pron"].get().strip()
         links_str = self.ui["entry_links"].get().strip()
         links = [s.strip() for s in links_str.split(',') if s.strip()]
@@ -253,14 +323,18 @@ class ItemTab:
         if messagebox.askyesno("Conferma", f"Eliminare '{self.current_item}'?"):
             self.db.delete_item(self.current_item, self.item_type)
             self.current_item = None
-            self.ui["title"].config(text="Nessun elemento")
+            self.ui["title"].configure(text="Nessun elemento")
             self._clear_editor()
             self.refresh()
 
     def new_item(self):
         label = "Nuova Parola" if self.item_type == "word" else "Nuovo Detto"
         prompt = "Nome della parola:" if self.item_type == "word" else "Titolo del detto:"
-        name = simpledialog.askstring(label, prompt)
+        
+        # CTkInputDialog moderno al posto di simpledialog
+        dialog = ctk.CTkInputDialog(text=prompt, title=label)
+        name = dialog.get_input()
+        
         if not name:
             return
         name = name.strip()
@@ -272,10 +346,9 @@ class ItemTab:
 
         self.current_item = name.capitalize() if self.item_type == "word" else name
         self._clear_editor()
-        self.ui["title"].config(text=self.current_item)
+        self.ui["title"].configure(text=self.current_item)
         self.ui["list"].selection_clear(0, tk.END)
 
-        # Lookup automatico nel dizionario (solo per parole)
         if self.item_type == "word":
             self._dictionary_lookup(name)
 
@@ -284,8 +357,8 @@ class ItemTab:
     # ── Utility ────────────────────────────────────────────────────
 
     def _clear_editor(self):
-        self.ui["def"].delete(1.0, tk.END)
-        self.ui["ety"].delete(1.0, tk.END)
+        self.ui["def"].delete("1.0", tk.END)
+        self.ui["ety"].delete("1.0", tk.END)
         self.ui["pron"].delete(0, tk.END)
         self.ui["entry_links"].delete(0, tk.END)
         self.ui["links"].delete(0, tk.END)
@@ -296,7 +369,6 @@ class ItemTab:
             TTS.speak(pron if pron else self.current_item)
 
     def _dictionary_lookup(self, word):
-        # Cerca dictionary.db in più posizioni (dev, build, dist)
         candidates = [
             os.path.join(BASE_DIR, "dictionary.db"),
             os.path.join(BASE_DIR, "dist", "dictionary.db"),
@@ -369,9 +441,8 @@ class ItemTab:
 
             if dialog.selected_word:
                 selected = dialog.selected_word
-                # Aggiorna il nome del lemma corrente
                 self.current_item = selected
-                self.ui["title"].config(text=selected)
+                self.ui["title"].configure(text=selected)
                 self._clear_editor()
                 
                 # Carica i dettagli della parola selezionata

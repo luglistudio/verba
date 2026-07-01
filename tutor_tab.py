@@ -1,17 +1,18 @@
-"""Tab Tutor AI — chat, quiz, integrazione NotebookLM."""
+"""Tab Tutor AI — chat, quiz, integrazione NotebookLM con CustomTkinter."""
 
 import json
 import os
 import re
 import threading
 import tkinter as tk
-from tkinter import ttk, messagebox
+import customtkinter as ctk
+from tkinter import messagebox
 
 from constants import BASE_DIR, NOTEBOOKLM_CLI, debug_log, get_notebooklm_env
 
 
 class TutorTab:
-    """Gestisce il tab Tutor AI: chat, quiz generation, NotebookLM CLI."""
+    """Gestisce il tab Tutor AI: chat, quiz generation, NotebookLM CLI usando CustomTkinter."""
 
     def __init__(self, parent_frame, db, enqueue_ui):
         self.parent_frame = parent_frame
@@ -40,101 +41,118 @@ class TutorTab:
     # ── Layout ─────────────────────────────────────────────────────
 
     def _setup_layout(self):
-        top_frame = ttk.Frame(self.parent_frame)
+        # Ripulisce eventuali widget esistenti se viene resettata la sessione
+        for widget in self.parent_frame.winfo_children():
+            widget.destroy()
+
+        top_frame = ctk.CTkFrame(self.parent_frame, fg_color="transparent")
         top_frame.pack(fill=tk.X, pady=10, padx=10)
 
-        self.btn_prep = ttk.Button(top_frame, text="Prepara Sessione (Invia Vocabolario a NotebookLM)", command=self.prepare_session)
+        self.btn_prep = ctk.CTkButton(top_frame, text="Prepara Sessione (Invia Vocabolario a NotebookLM)", command=self.prepare_session)
         self.btn_prep.pack(side=tk.LEFT)
 
-        self.btn_quiz_def = ttk.Button(top_frame, text="Quiz Definizioni", command=lambda: self.start_quiz_generation("definitions"), state=tk.DISABLED)
+        self.btn_quiz_def = ctk.CTkButton(top_frame, text="Quiz Definizioni", command=lambda: self.start_quiz_generation("definitions"), state=tk.DISABLED)
         self.btn_quiz_def.pack(side=tk.LEFT, padx=5)
 
-        self.btn_quiz_fill = ttk.Button(top_frame, text="Quiz Completamento", command=lambda: self.start_quiz_generation("fill_blank"), state=tk.DISABLED)
+        self.btn_quiz_fill = ctk.CTkButton(top_frame, text="Quiz Completamento", command=lambda: self.start_quiz_generation("fill_blank"), state=tk.DISABLED)
         self.btn_quiz_fill.pack(side=tk.LEFT, padx=5)
 
         # 1. Contenitore Chat
-        self.chat_container_frame = ttk.Frame(self.parent_frame)
+        self.chat_container_frame = ctk.CTkFrame(self.parent_frame, fg_color="transparent")
         self.chat_container_frame.pack(fill=tk.BOTH, expand=True)
 
-        chat_frame = ttk.Frame(self.chat_container_frame)
+        chat_frame = ctk.CTkFrame(self.chat_container_frame, fg_color="transparent")
         chat_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
-        s_chat = ttk.Scrollbar(chat_frame)
-        s_chat.pack(side=tk.RIGHT, fill=tk.Y)
-        self.tutor_chat = tk.Text(chat_frame, wrap=tk.WORD, font=("System", 14), yscrollcommand=s_chat.set, state=tk.DISABLED)
-        self.tutor_chat.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        s_chat.config(command=self.tutor_chat.yview)
+        # CTkTextbox ha le scrollbar integrate ed è molto più pulito
+        self.tutor_chat = ctk.CTkTextbox(chat_frame, wrap=tk.WORD, font=("System", 14), state=tk.DISABLED)
+        self.tutor_chat.pack(fill=tk.BOTH, expand=True)
 
-        bottom_frame = ttk.Frame(self.chat_container_frame)
+        bottom_frame = ctk.CTkFrame(self.chat_container_frame, fg_color="transparent")
         bottom_frame.pack(fill=tk.X, pady=10, padx=10)
 
-        self.tutor_input = ttk.Entry(bottom_frame, font=("System", 14))
+        self.tutor_input = ctk.CTkEntry(bottom_frame, font=("System", 14), placeholder_text="Scrivi al Tutor...")
         self.tutor_input.pack(side=tk.LEFT, fill=tk.X, expand=True)
         self.tutor_input.bind("<Return>", lambda e: self.send_tutor_msg())
 
-        self.btn_send = ttk.Button(bottom_frame, text="Invia Risposta", command=self.send_tutor_msg, state=tk.DISABLED)
+        self.btn_send = ctk.CTkButton(bottom_frame, text="Invia Risposta", width=120, command=self.send_tutor_msg, state=tk.DISABLED)
         self.btn_send.pack(side=tk.RIGHT, padx=(10, 0))
 
         # 2. Contenitore Quiz (nascosto all'inizio)
-        self.quiz_container_frame = ttk.Frame(self.parent_frame)
+        self.quiz_container_frame = ctk.CTkFrame(self.parent_frame, fg_color="transparent")
 
-        self.quiz_header_frame = ttk.Frame(self.quiz_container_frame)
+        self.quiz_header_frame = ctk.CTkFrame(self.quiz_container_frame, fg_color="transparent")
         self.quiz_header_frame.pack(fill=tk.X, pady=(10, 5), padx=15)
-        self.quiz_progress_lbl = ttk.Label(self.quiz_header_frame, text="Domanda 0 di 0 | Punteggio: 0/0", font=("System", 14, "bold"))
+        self.quiz_progress_lbl = ctk.CTkLabel(self.quiz_header_frame, text="Domanda 0 di 0 | Punteggio: 0/0", font=ctk.CTkFont(family="System", size=14, weight="bold"))
         self.quiz_progress_lbl.pack(side=tk.LEFT)
 
-        self.quiz_question_lbl = ttk.Label(self.quiz_container_frame, text="Domanda...", font=("System", 16), wraplength=700, anchor=tk.W, justify=tk.LEFT)
+        self.quiz_question_lbl = ctk.CTkLabel(self.quiz_container_frame, text="Domanda...", font=ctk.CTkFont(family="System", size=16), justify=tk.LEFT, anchor=tk.W)
         self.quiz_question_lbl.pack(fill=tk.X, pady=15, padx=15)
 
-        self.quiz_options_frame = ttk.Frame(self.quiz_container_frame)
+        self.quiz_options_frame = ctk.CTkFrame(self.quiz_container_frame, fg_color="transparent")
         self.quiz_options_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=10)
 
         self.quiz_opt_buttons = []
         for i in range(4):
-            btn = tk.Button(
+            btn = ctk.CTkButton(
                 self.quiz_options_frame,
                 text=f"Opzione {i+1}",
-                font=("System", 13),
+                font=ctk.CTkFont(family="System", size=13),
                 anchor="w",
-                padx=15,
-                pady=10,
-                bg="#f8f9fa",
-                fg="#212529",
-                highlightbackground="#f8f9fa",
+                height=45,
                 command=lambda idx=i: self.select_quiz_option(idx)
             )
             btn.pack(fill=tk.X, pady=5)
             self.quiz_opt_buttons.append(btn)
+        
+        self._reset_opt_buttons_style()
 
-        self.quiz_feedback_frame = ttk.Frame(self.quiz_container_frame)
+        self.quiz_feedback_frame = ctk.CTkFrame(self.quiz_container_frame)
         self.quiz_feedback_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=10)
 
-        self.quiz_rationale_lbl = ttk.Label(self.quiz_feedback_frame, text="Spiegazione:", font=("System", 12, "bold"))
-        self.quiz_rationale_lbl.pack(anchor=tk.W)
-        self.quiz_rationale_txt = tk.Text(self.quiz_feedback_frame, wrap=tk.WORD, font=("System", 13), height=4, state=tk.DISABLED)
-        self.quiz_rationale_txt.pack(fill=tk.BOTH, expand=True, pady=5)
+        self.quiz_rationale_lbl = ctk.CTkLabel(self.quiz_feedback_frame, text="Spiegazione:", font=ctk.CTkFont(family="System", size=12, weight="bold"))
+        self.quiz_rationale_lbl.pack(anchor=tk.W, padx=10, pady=(5, 2))
+        self.quiz_rationale_txt = ctk.CTkTextbox(self.quiz_feedback_frame, wrap=tk.WORD, font=("System", 13), height=100, state=tk.DISABLED)
+        self.quiz_rationale_txt.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-        self.quiz_nav_frame = ttk.Frame(self.quiz_container_frame)
+        self.quiz_nav_frame = ctk.CTkFrame(self.quiz_container_frame, fg_color="transparent")
         self.quiz_nav_frame.pack(fill=tk.X, pady=15, padx=15)
 
-        self.btn_quiz_hint = ttk.Button(self.quiz_nav_frame, text="Suggerimento 💡", command=self.show_quiz_hint)
+        self.btn_quiz_hint = ctk.CTkButton(self.quiz_nav_frame, text="Suggerimento 💡", width=120, command=self.show_quiz_hint)
         self.btn_quiz_hint.pack(side=tk.LEFT)
 
-        self.btn_quiz_exit = ttk.Button(self.quiz_nav_frame, text="Esci dal Quiz ❌", command=self.exit_quiz_view)
+        self.btn_quiz_exit = ctk.CTkButton(self.quiz_nav_frame, text="Esci dal Quiz ❌", fg_color="#ff3b30", hover_color="#dc3545", text_color="#ffffff", width=120, command=self.exit_quiz_view)
         self.btn_quiz_exit.pack(side=tk.RIGHT)
 
-        self.btn_quiz_next = ttk.Button(self.quiz_nav_frame, text="Avanti ➡️", command=self.next_quiz_question, state=tk.DISABLED)
+        self.btn_quiz_next = ctk.CTkButton(self.quiz_nav_frame, text="Avanti ➡️", width=120, command=self.next_quiz_question, state=tk.DISABLED)
         self.btn_quiz_next.pack(side=tk.RIGHT, padx=10)
+
+    def _get_opt_btn_colors(self):
+        is_dark = ctk.get_appearance_mode() == "Dark"
+        return {
+            "fg_color": "#2c2c2e" if is_dark else "#e5e5ea",
+            "hover_color": "#3a3a3c" if is_dark else "#d1d1d6",
+            "text_color": "#ffffff" if is_dark else "#000000"
+        }
+
+    def _reset_opt_buttons_style(self):
+        colors = self._get_opt_btn_colors()
+        for btn in self.quiz_opt_buttons:
+            btn.configure(
+                fg_color=colors["fg_color"],
+                hover_color=colors["hover_color"],
+                text_color=colors["text_color"],
+                state=tk.NORMAL
+            )
 
     # ── Chat ───────────────────────────────────────────────────────
 
     def append_chat(self, text, is_user=False):
-        self.tutor_chat.config(state=tk.NORMAL)
+        self.tutor_chat.configure(state=tk.NORMAL)
         prefix = "TU: " if is_user else "TUTOR: "
         self.tutor_chat.insert(tk.END, f"{prefix}{text}\n\n")
         self.tutor_chat.see(tk.END)
-        self.tutor_chat.config(state=tk.DISABLED)
-        self.tutor_chat.update_idletasks()
+        self.tutor_chat.configure(state=tk.DISABLED)
 
     # ── NotebookLM CLI runner ──────────────────────────────────────
 
@@ -201,16 +219,16 @@ class TutorTab:
         threading.Thread(target=task, daemon=True).start()
 
     def _on_notebook_detected(self, notebook_id):
-        self.btn_prep.config(text="Sessione Pronta! (Aggiorna)")
-        self.btn_quiz_def.config(state=tk.NORMAL)
-        self.btn_quiz_fill.config(state=tk.NORMAL)
-        self.btn_send.config(state=tk.NORMAL)
+        self.btn_prep.configure(text="Sessione Pronta! (Aggiorna)")
+        self.btn_quiz_def.configure(state=tk.NORMAL)
+        self.btn_quiz_fill.configure(state=tk.NORMAL)
+        self.btn_send.configure(state=tk.NORMAL)
         self.append_chat(f"📂 Rilevato Notebook esistente ({notebook_id}).\nLa chat e i quiz sono abilitati! Se hai aggiunto nuove parole, clicca su \"Sessione Pronta! (Aggiorna)\" per inviarle.")
 
     # ── Prepare session ────────────────────────────────────────────
 
     def prepare_session(self):
-        self.btn_prep.config(state=tk.DISABLED, text="Preparazione in corso...")
+        self.btn_prep.configure(state=tk.DISABLED, text="Preparazione...")
         self.append_chat("Compilando il database locale per NotebookLM...")
         debug_log("prepare_session triggered")
 
@@ -263,7 +281,7 @@ class TutorTab:
             except Exception as e:
                 debug_log(f"prepare_session: file export failed: {e}")
                 self._enqueue_ui(lambda: messagebox.showerror("Errore", f"Impossibile creare il file: {e}"))
-                self._enqueue_ui(lambda: self.btn_prep.config(state=tk.NORMAL, text="Prepara Sessione (Invia Vocabolario a NotebookLM)"))
+                self._enqueue_ui(lambda: self.btn_prep.configure(state=tk.NORMAL, text="Prepara Sessione (Invia Vocabolario a NotebookLM)"))
                 return
 
             try:
@@ -372,35 +390,35 @@ class TutorTab:
             except subprocess.TimeoutExpired as e:
                 debug_log(f"prepare_session timeout error: {e}")
                 self._enqueue_ui(lambda: self.append_chat(f"❌ Errore: timeout superato per il comando a NotebookLM ({e.cmd})"))
-                self._enqueue_ui(lambda: self.btn_prep.config(state=tk.NORMAL, text="Prepara Sessione (Invia Vocabolario a NotebookLM)"))
+                self._enqueue_ui(lambda: self.btn_prep.configure(state=tk.NORMAL, text="Prepara Sessione (Invia Vocabolario a NotebookLM)"))
             except subprocess.CalledProcessError as e:
                 err_msg = e.stderr or e.stdout or str(e)
                 debug_log(f"prepare_session CLI error: {err_msg}")
                 self._enqueue_ui(lambda: self.append_chat(f"❌ Errore CLI: {err_msg}"))
-                self._enqueue_ui(lambda: self.btn_prep.config(state=tk.NORMAL, text="Prepara Sessione (Invia Vocabolario a NotebookLM)"))
+                self._enqueue_ui(lambda: self.btn_prep.configure(state=tk.NORMAL, text="Prepara Sessione (Invia Vocabolario a NotebookLM)"))
             except Exception as e:
                 debug_log(f"prepare_session unexpected error: {e}")
                 self._enqueue_ui(lambda: self.append_chat(f"❌ Errore imprevisto: {e}"))
-                self._enqueue_ui(lambda: self.btn_prep.config(state=tk.NORMAL, text="Prepara Sessione (Invia Vocabolario a NotebookLM)"))
+                self._enqueue_ui(lambda: self.btn_prep.configure(state=tk.NORMAL, text="Prepara Sessione (Invia Vocabolario a NotebookLM)"))
 
         threading.Thread(target=task, daemon=True).start()
 
     def _session_ready(self):
-        self.btn_prep.config(text="Sessione Pronta! (Aggiorna)")
-        self.btn_quiz_def.config(state=tk.NORMAL)
-        self.btn_quiz_fill.config(state=tk.NORMAL)
-        self.btn_send.config(state=tk.NORMAL)
+        self.btn_prep.configure(text="Sessione Pronta! (Aggiorna)")
+        self.btn_quiz_def.configure(state=tk.NORMAL)
+        self.btn_quiz_fill.configure(state=tk.NORMAL)
+        self.btn_send.configure(state=tk.NORMAL)
         self.append_chat("Il tuo vocabolario è stato caricato su NotebookLM! Clicca su 'Quiz Definizioni' o 'Quiz Completamento' per iniziare.")
 
     # ── Quiz generation ────────────────────────────────────────────
 
     def _enable_quiz_buttons(self):
-        self.btn_quiz_def.config(state=tk.NORMAL, text="Quiz Definizioni")
-        self.btn_quiz_fill.config(state=tk.NORMAL, text="Quiz Completamento")
+        self.btn_quiz_def.configure(state=tk.NORMAL, text="Quiz Definizioni")
+        self.btn_quiz_fill.configure(state=tk.NORMAL, text="Quiz Completamento")
 
     def _disable_quiz_buttons(self, active_text="Caricamento..."):
-        self.btn_quiz_def.config(state=tk.DISABLED, text=active_text)
-        self.btn_quiz_fill.config(state=tk.DISABLED, text=active_text)
+        self.btn_quiz_def.configure(state=tk.DISABLED, text=active_text)
+        self.btn_quiz_fill.configure(state=tk.DISABLED, text=active_text)
 
     def start_quiz_generation(self, quiz_type="definitions"):
         if not self.notebooklm_id:
@@ -497,33 +515,30 @@ class TutorTab:
         self.quiz_answers_checked = False
 
         tot = len(self.quiz_data["questions"])
-        self.quiz_progress_lbl.config(text=f"Domanda {self.quiz_current_index + 1} di {tot} | Punteggio: {self.quiz_score}/{self.quiz_current_index}")
+        self.quiz_progress_lbl.configure(text=f"Domanda {self.quiz_current_index + 1} di {tot} | Punteggio: {self.quiz_score}/{self.quiz_current_index}")
 
-        self.quiz_question_lbl.config(text=q_data["question"])
+        self.quiz_question_lbl.configure(text=q_data["question"])
 
+        self._reset_opt_buttons_style()
         options = q_data.get("answerOptions", [])
         for i in range(4):
             btn = self.quiz_opt_buttons[i]
             if i < len(options):
                 opt = options[i]
-                btn.config(
+                btn.configure(
                     text=f"{chr(65+i)}) {opt['text']}",
-                    state=tk.NORMAL,
-                    bg="#f8f9fa",
-                    fg="#212529",
-                    highlightbackground="#f8f9fa",
-                    relief="raised"
+                    state=tk.NORMAL
                 )
                 btn.pack(fill=tk.X, pady=5)
             else:
                 btn.pack_forget()
 
-        self.quiz_rationale_txt.config(state=tk.NORMAL)
-        self.quiz_rationale_txt.delete(1.0, tk.END)
-        self.quiz_rationale_txt.config(state=tk.DISABLED)
+        self.quiz_rationale_txt.configure(state=tk.NORMAL)
+        self.quiz_rationale_txt.delete("1.0", tk.END)
+        self.quiz_rationale_txt.configure(state=tk.DISABLED)
 
-        self.btn_quiz_next.config(state=tk.DISABLED)
-        self.btn_quiz_hint.config(state=tk.NORMAL if q_data.get("hint") else tk.DISABLED)
+        self.btn_quiz_next.configure(state=tk.DISABLED)
+        self.btn_quiz_hint.configure(state=tk.NORMAL if q_data.get("hint") else tk.DISABLED)
 
     def select_quiz_option(self, index):
         if self.quiz_answers_checked:
@@ -545,23 +560,23 @@ class TutorTab:
             opt_text = options[i]['text']
 
             if i == correct_idx:
-                btn.config(
+                btn.configure(
                     text=f"✅ {prefix}{opt_text}",
-                    bg="#c3e6cb",
-                    highlightbackground="#c3e6cb",
-                    fg="#155724",
-                    activebackground="#c3e6cb"
+                    fg_color="#34c759",
+                    hover_color="#34c759",
+                    text_color="#ffffff",
+                    state=tk.NORMAL
                 )
             elif i == index:
-                btn.config(
+                btn.configure(
                     text=f"❌ {prefix}{opt_text}",
-                    bg="#f5c6cb",
-                    highlightbackground="#f5c6cb",
-                    fg="#721c24",
-                    activebackground="#f5c6cb"
+                    fg_color="#ff3b30",
+                    hover_color="#ff3b30",
+                    text_color="#ffffff",
+                    state=tk.NORMAL
                 )
             else:
-                btn.config(state=tk.DISABLED)
+                btn.configure(state=tk.DISABLED)
 
         selected_correct = (index == correct_idx)
         if selected_correct:
@@ -573,16 +588,16 @@ class TutorTab:
         if not selected_correct and correct_idx != -1:
             rationale_text += f"Risposta Corretta: {options[correct_idx].get('rationale', '')}"
 
-        self.quiz_rationale_txt.config(state=tk.NORMAL)
-        self.quiz_rationale_txt.delete(1.0, tk.END)
+        self.quiz_rationale_txt.configure(state=tk.NORMAL)
+        self.quiz_rationale_txt.delete("1.0", tk.END)
         self.quiz_rationale_txt.insert(tk.END, rationale_text)
-        self.quiz_rationale_txt.config(state=tk.DISABLED)
+        self.quiz_rationale_txt.configure(state=tk.DISABLED)
 
         tot = len(self.quiz_data["questions"])
-        self.quiz_progress_lbl.config(text=f"Domanda {self.quiz_current_index + 1} di {tot} | Punteggio: {self.quiz_score}/{self.quiz_current_index + 1}")
+        self.quiz_progress_lbl.configure(text=f"Domanda {self.quiz_current_index + 1} di {tot} | Punteggio: {self.quiz_score}/{self.quiz_current_index + 1}")
 
-        self.btn_quiz_next.config(state=tk.NORMAL)
-        self.btn_quiz_hint.config(state=tk.DISABLED)
+        self.btn_quiz_next.configure(state=tk.NORMAL)
+        self.btn_quiz_hint.configure(state=tk.DISABLED)
 
     def show_quiz_hint(self):
         if not self.quiz_data:
@@ -603,18 +618,18 @@ class TutorTab:
         for btn in self.quiz_opt_buttons:
             btn.pack_forget()
 
-        self.quiz_progress_lbl.config(text="Quiz Completato!")
-        self.quiz_question_lbl.config(
+        self.quiz_progress_lbl.configure(text="Quiz Completato!")
+        self.quiz_question_lbl.configure(
             text=f"Complimenti! Hai completato il quiz.\n\nPunteggio Finale: {self.quiz_score} su {tot} ({pct:.1f}% di risposte corrette)."
         )
 
-        self.quiz_rationale_txt.config(state=tk.NORMAL)
-        self.quiz_rationale_txt.delete(1.0, tk.END)
+        self.quiz_rationale_txt.configure(state=tk.NORMAL)
+        self.quiz_rationale_txt.delete("1.0", tk.END)
         self.quiz_rationale_txt.insert(tk.END, "Puoi chiudere il quiz e ritornare alla chat, oppure generarne un altro!")
-        self.quiz_rationale_txt.config(state=tk.DISABLED)
+        self.quiz_rationale_txt.configure(state=tk.DISABLED)
 
-        self.btn_quiz_next.config(state=tk.DISABLED)
-        self.btn_quiz_hint.config(state=tk.DISABLED)
+        self.btn_quiz_next.configure(state=tk.DISABLED)
+        self.btn_quiz_hint.configure(state=tk.DISABLED)
 
     def exit_quiz_view(self):
         self.quiz_container_frame.pack_forget()
@@ -628,11 +643,11 @@ class TutorTab:
             return
         self.tutor_input.delete(0, tk.END)
         self.append_chat(msg, is_user=True)
-        self.btn_send.config(state=tk.DISABLED)
+        self.btn_send.configure(state=tk.DISABLED)
         self._run_cli(["ask", msg, "-n", self.notebooklm_id], self._on_tutor_response)
 
     def _on_tutor_response(self, text):
         self.append_chat(text)
-        self.btn_send.config(state=tk.NORMAL)
-        self.btn_quiz_def.config(state=tk.NORMAL)
-        self.btn_quiz_fill.config(state=tk.NORMAL)
+        self.btn_send.configure(state=tk.NORMAL)
+        self.btn_quiz_def.configure(state=tk.NORMAL)
+        self.btn_quiz_fill.configure(state=tk.NORMAL)

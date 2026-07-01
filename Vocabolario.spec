@@ -1,11 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
+import customtkinter
 
+customtkinter_path = os.path.dirname(customtkinter.__file__)
 
 a = Analysis(
     ['app.py'],
     pathex=['.'],
     binaries=[],
-    datas=[('icon.png', '.'), ('wiki', 'wiki')],
+    datas=[('icon.png', '.'), ('wiki', 'wiki'), (customtkinter_path, 'customtkinter')],
     hiddenimports=['constants', 'db', 'tts', 'item_tab', 'tutor_tab', 'spaced_tab'],
     hookspath=[],
     hooksconfig={},
