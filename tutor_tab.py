@@ -22,6 +22,9 @@ class TutorTab:
         self._nb_lock = threading.Lock()
         self._notebooklm_id = None
 
+        self._setup_layout()
+
+
     @property
     def notebooklm_id(self):
         with self._nb_lock:
