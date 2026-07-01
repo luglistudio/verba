@@ -10,6 +10,72 @@ from constants import BASE_DIR, debug_log
 from tts import TTS
 
 
+class SuggestionDialog(tk.Toplevel):
+    def __init__(self, parent, suggestions):
+        super().__init__(parent)
+        self.title("Suggerimenti Dizionario")
+        self.geometry("380x320")
+        self.resizable(False, False)
+        self.transient(parent)
+        self.grab_set()
+
+        # Centra la finestra rispetto al genitore
+        self.update_idletasks()
+        p_width = parent.winfo_width()
+        p_height = parent.winfo_height()
+        p_x = parent.winfo_x()
+        p_y = parent.winfo_y()
+        w = 380
+        h = 320
+        x = p_x + (p_width - w) // 2
+        y = p_y + (p_height - h) // 2
+        self.geometry(f"{w}x{h}+{x}+{y}")
+
+        self.selected_word = None
+
+        # Widgets
+        main_frame = ttk.Frame(self, padding="15")
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        lbl = ttk.Label(main_frame, text="Parola non trovata. Forse cercavi:", font=("System", 13, "bold"))
+        lbl.pack(anchor=tk.W, pady=(0, 10))
+
+        list_frame = ttk.Frame(main_frame)
+        list_frame.pack(fill=tk.BOTH, expand=True)
+
+        scrollbar = ttk.Scrollbar(list_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        self.listbox = tk.Listbox(list_frame, yscrollcommand=scrollbar.set, font=("System", 13), selectbackground="#007aff")
+        self.listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.config(command=self.listbox.yview)
+
+        for item in suggestions:
+            self.listbox.insert(tk.END, item)
+
+        self.listbox.bind("<Double-Button-1>", lambda e: self._on_select())
+
+        btn_frame = ttk.Frame(main_frame)
+        btn_frame.pack(fill=tk.X, pady=(15, 0))
+
+        btn_select = ttk.Button(btn_frame, text="Seleziona", command=self._on_select)
+        btn_select.pack(side=tk.RIGHT, padx=(5, 0))
+
+        btn_cancel = ttk.Button(btn_frame, text="Annulla", command=self.destroy)
+        btn_cancel.pack(side=tk.RIGHT)
+
+        # Focus
+        self.listbox.focus_set()
+        if suggestions:
+            self.listbox.selection_set(0)
+
+    def _on_select(self):
+        sel = self.listbox.curselection()
+        if sel:
+            self.selected_word = self.listbox.get(sel[0])
+        self.destroy()
+
+
 class ItemTab:
     """Gestisce un tab (Parole o Detti) con lista, links navigabili e editor."""
 
@@ -238,14 +304,84 @@ class ItemTab:
         db_path = next((p for p in candidates if os.path.exists(p)), None)
         if not db_path:
             return
+        
+        word_lower = word.lower().strip()
         try:
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
-            cursor.execute("SELECT definition, etymology FROM dictionary WHERE word=?", (word.lower(),))
+            
+            # 1. Ricerca esatta
+            cursor.execute("SELECT definition, etymology FROM dictionary WHERE word=?", (word_lower,))
             row = cursor.fetchone()
-            conn.close()
             if row:
                 self.ui["def"].insert(tk.END, row[0] if row[0] else "")
                 self.ui["ety"].insert(tk.END, row[1] if row[1] else "")
+                conn.close()
+                return
+
+            # 2. Ricerca varianti singolare/plurale (regole di flessione italiane)
+            parent = self.parent_frame.winfo_toplevel()
+            stem_candidates = []
+            if word_lower.endswith('i'):
+                stem_candidates.extend([word_lower[:-1] + 'o', word_lower[:-1] + 'a', word_lower[:-1] + 'e'])
+            elif word_lower.endswith('e'):
+                stem_candidates.append(word_lower[:-1] + 'a')
+            elif word_lower.endswith('o'):
+                stem_candidates.append(word_lower[:-1] + 'i')
+            elif word_lower.endswith('a'):
+                stem_candidates.extend([word_lower[:-1] + 'e', word_lower[:-1] + 'i'])
+
+            found_variants = []
+            for cand in stem_candidates:
+                cursor.execute("SELECT word FROM dictionary WHERE word=?", (cand,))
+                r = cursor.fetchone()
+                if r:
+                    found_variants.append(r[0])
+
+            # 3. Ricerca parziale LIKE (ricerca indicizzata tramite prefisso)
+            like_pattern = word_lower + "%"
+            cursor.execute("SELECT word FROM dictionary WHERE word LIKE ? LIMIT 15", (like_pattern,))
+            like_results = [r[0] for r in cursor.fetchall()]
+
+            # Ricerca parziale con tolleranza d'errore (rimuovendo l'ultimo carattere)
+            if len(word_lower) > 3:
+                like_pattern_short = word_lower[:-1] + "%"
+                cursor.execute("SELECT word FROM dictionary WHERE word LIKE ? LIMIT 15", (like_pattern_short,))
+                like_results.extend([r[0] for r in cursor.fetchall()])
+
+            conn.close()
+
+            # Unisci i suggerimenti eliminando i duplicati e preservando l'ordine
+            suggestions = []
+            seen = set()
+            for w in found_variants + like_results:
+                w_cap = w.capitalize()
+                if w_cap not in seen and w.lower() != word_lower:
+                    seen.add(w_cap)
+                    suggestions.append(w_cap)
+
+            if not suggestions:
+                return
+
+            # Mostra la finestra di dialogo dei suggerimenti
+            dialog = SuggestionDialog(parent, suggestions)
+            self.parent_frame.wait_window(dialog)
+
+            if dialog.selected_word:
+                selected = dialog.selected_word
+                # Aggiorna il nome del lemma corrente
+                self.current_item = selected
+                self.ui["title"].config(text=selected)
+                self._clear_editor()
+                
+                # Carica i dettagli della parola selezionata
+                conn = sqlite3.connect(db_path)
+                cursor = conn.cursor()
+                cursor.execute("SELECT definition, etymology FROM dictionary WHERE word=?", (selected.lower(),))
+                row = cursor.fetchone()
+                conn.close()
+                if row:
+                    self.ui["def"].insert(tk.END, row[0] if row[0] else "")
+                    self.ui["ety"].insert(tk.END, row[1] if row[1] else "")
         except Exception as e:
             debug_log(f"Dictionary lookup error: {e}")
