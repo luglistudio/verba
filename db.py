@@ -1,4 +1,4 @@
-"""Database vocabbolario — gestione file markdown."""
+"""Database vocabolario — gestione file markdown."""
 
 import os
 import re
@@ -134,19 +134,6 @@ class WordDatabase:
         content = f"---\n{yaml_str}\n---\n\n# {title_prefix}{item_name}\n\n## 📖 Significato\n{definition}{ety_str}{links_str}\n"
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(content)
-
-    def load_data(self):
-        self.words = {}
-        self.sayings = {}
-        for filename in os.listdir(self.directory):
-            if filename.endswith(".md"):
-                filepath = os.path.join(self.directory, filename)
-                info = self._parse_file(filepath)
-                if info:
-                    if info['metadata'].get('type') == 'detto':
-                        self.sayings[info['word']] = info
-                    else:
-                        self.words[info['word']] = info
 
     def _parse_file(self, filepath):
         try:
