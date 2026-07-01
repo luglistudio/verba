@@ -388,11 +388,28 @@ class ItemTab:
             cursor = conn.cursor()
             
             # 1. Ricerca esatta
-            cursor.execute("SELECT definition, etymology FROM dictionary WHERE word=?", (word_lower,))
+            cursor.execute("SELECT definition, etymology, synonyms, accented FROM dictionary WHERE word=?", (word_lower,))
             row = cursor.fetchone()
             if row:
-                self.ui["def"].insert(tk.END, row[0] if row[0] else "")
-                self.ui["ety"].insert(tk.END, row[1] if row[1] else "")
+                definition, etymology, synonyms, accented = row
+                if accented:
+                    display_word = accented.capitalize()
+                    self.current_item = display_word
+                    self.ui["title"].configure(text=display_word)
+                
+                self.ui["def"].insert(tk.END, definition if definition else "")
+                self.ui["ety"].insert(tk.END, etymology if etymology else "")
+                
+                if synonyms:
+                    self.ui["entry_links"].insert(0, synonyms)
+                    syn_list = [s.strip() for s in synonyms.split(",") if s.strip()]
+                    self.ui["links"].delete(0, tk.END)
+                    for syn in syn_list:
+                        self.ui["links"].insert(tk.END, syn)
+                
+                if accented:
+                    self.ui["pron"].insert(0, accented)
+                
                 conn.close()
                 return
 
@@ -453,12 +470,28 @@ class ItemTab:
                 # Carica i dettagli della parola selezionata
                 conn = sqlite3.connect(db_path)
                 cursor = conn.cursor()
-                cursor.execute("SELECT definition, etymology FROM dictionary WHERE word=?", (selected.lower(),))
+                cursor.execute("SELECT definition, etymology, synonyms, accented FROM dictionary WHERE word=?", (selected.lower(),))
                 row = cursor.fetchone()
                 conn.close()
                 if row:
-                    self.ui["def"].insert(tk.END, row[0] if row[0] else "")
-                    self.ui["ety"].insert(tk.END, row[1] if row[1] else "")
+                    definition, etymology, synonyms, accented = row
+                    if accented:
+                        display_word = accented.capitalize()
+                        self.current_item = display_word
+                        self.ui["title"].configure(text=display_word)
+                    
+                    self.ui["def"].insert(tk.END, definition if definition else "")
+                    self.ui["ety"].insert(tk.END, etymology if etymology else "")
+                    
+                    if synonyms:
+                        self.ui["entry_links"].insert(0, synonyms)
+                        syn_list = [s.strip() for s in synonyms.split(",") if s.strip()]
+                        self.ui["links"].delete(0, tk.END)
+                        for syn in syn_list:
+                            self.ui["links"].insert(tk.END, syn)
+                            
+                    if accented:
+                        self.ui["pron"].insert(0, accented)
         except Exception as e:
             debug_log(f"Dictionary lookup error: {e}")
 
